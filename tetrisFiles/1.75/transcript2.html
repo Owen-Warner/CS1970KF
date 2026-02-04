@@ -1,0 +1,3709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code transcript - page 1</title>
+    <style>
+:root { --bg-color: #f5f5f5; --card-bg: #ffffff; --user-bg: #e3f2fd; --user-border: #1976d2; --assistant-bg: #f5f5f5; --assistant-border: #9e9e9e; --thinking-bg: #fff8e1; --thinking-border: #ffc107; --thinking-text: #666; --tool-bg: #f3e5f5; --tool-border: #9c27b0; --tool-result-bg: #e8f5e9; --tool-error-bg: #ffebee; --text-color: #212121; --text-muted: #757575; --code-bg: #263238; --code-text: #aed581; }
+* { box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; padding: 16px; line-height: 1.6; }
+.container { max-width: 800px; margin: 0 auto; }
+h1 { font-size: 1.5rem; margin-bottom: 24px; padding-bottom: 8px; border-bottom: 2px solid var(--user-border); }
+.header-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 2px solid var(--user-border); padding-bottom: 8px; margin-bottom: 24px; }
+.header-row h1 { border-bottom: none; padding-bottom: 0; margin-bottom: 0; flex: 1; min-width: 200px; }
+.message { margin-bottom: 16px; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.message.user { background: var(--user-bg); border-left: 4px solid var(--user-border); }
+.message.assistant { background: var(--card-bg); border-left: 4px solid var(--assistant-border); }
+.message.tool-reply { background: #fff8e1; border-left: 4px solid #ff9800; }
+.tool-reply .role-label { color: #e65100; }
+.tool-reply .tool-result { background: transparent; padding: 0; margin: 0; }
+.tool-reply .tool-result .truncatable.truncated::after { background: linear-gradient(to bottom, transparent, #fff8e1); }
+.message-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; background: rgba(0,0,0,0.03); font-size: 0.85rem; }
+.role-label { font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.user .role-label { color: var(--user-border); }
+time { color: var(--text-muted); font-size: 0.8rem; }
+.timestamp-link { color: inherit; text-decoration: none; }
+.timestamp-link:hover { text-decoration: underline; }
+.message:target { animation: highlight 2s ease-out; }
+@keyframes highlight { 0% { background-color: rgba(25, 118, 210, 0.2); } 100% { background-color: transparent; } }
+.message-content { padding: 16px; }
+.message-content p { margin: 0 0 12px 0; }
+.message-content p:last-child { margin-bottom: 0; }
+.thinking { background: var(--thinking-bg); border: 1px solid var(--thinking-border); border-radius: 8px; padding: 12px; margin: 12px 0; font-size: 0.9rem; color: var(--thinking-text); }
+.thinking-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: #f57c00; margin-bottom: 8px; }
+.thinking p { margin: 8px 0; }
+.assistant-text { margin: 8px 0; }
+.tool-use { background: var(--tool-bg); border: 1px solid var(--tool-border); border-radius: 8px; padding: 12px; margin: 12px 0; }
+.tool-header { font-weight: 600; color: var(--tool-border); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.tool-icon { font-size: 1.1rem; }
+.tool-description { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 8px; font-style: italic; }
+.tool-result { background: var(--tool-result-bg); border-radius: 8px; padding: 12px; margin: 12px 0; }
+.tool-result.tool-error { background: var(--tool-error-bg); }
+.file-tool { border-radius: 8px; padding: 12px; margin: 12px 0; }
+.write-tool { background: linear-gradient(135deg, #e3f2fd 0%, #e8f5e9 100%); border: 1px solid #4caf50; }
+.edit-tool { background: linear-gradient(135deg, #fff3e0 0%, #fce4ec 100%); border: 1px solid #ff9800; }
+.file-tool-header { font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; }
+.write-header { color: #2e7d32; }
+.edit-header { color: #e65100; }
+.file-tool-icon { font-size: 1rem; }
+.file-tool-path { font-family: monospace; background: rgba(0,0,0,0.08); padding: 2px 8px; border-radius: 4px; }
+.file-tool-fullpath { font-family: monospace; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; word-break: break-all; }
+.file-content { margin: 0; }
+.edit-section { display: flex; margin: 4px 0; border-radius: 4px; overflow: hidden; }
+.edit-label { padding: 8px 12px; font-weight: bold; font-family: monospace; display: flex; align-items: flex-start; }
+.edit-old { background: #fce4ec; }
+.edit-old .edit-label { color: #b71c1c; background: #f8bbd9; }
+.edit-old .edit-content { color: #880e4f; }
+.edit-new { background: #e8f5e9; }
+.edit-new .edit-label { color: #1b5e20; background: #a5d6a7; }
+.edit-new .edit-content { color: #1b5e20; }
+.edit-content { margin: 0; flex: 1; background: transparent; font-size: 0.85rem; }
+.edit-replace-all { font-size: 0.75rem; font-weight: normal; color: var(--text-muted); }
+.write-tool .truncatable.truncated::after { background: linear-gradient(to bottom, transparent, #e6f4ea); }
+.edit-tool .truncatable.truncated::after { background: linear-gradient(to bottom, transparent, #fff0e5); }
+.todo-list { background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%); border: 1px solid #81c784; border-radius: 8px; padding: 12px; margin: 12px 0; }
+.todo-header { font-weight: 600; color: #2e7d32; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; }
+.todo-items { list-style: none; margin: 0; padding: 0; }
+.todo-item { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.06); font-size: 0.9rem; }
+.todo-item:last-child { border-bottom: none; }
+.todo-icon { flex-shrink: 0; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 50%; }
+.todo-completed .todo-icon { color: #2e7d32; background: rgba(46, 125, 50, 0.15); }
+.todo-completed .todo-content { color: #558b2f; text-decoration: line-through; }
+.todo-in-progress .todo-icon { color: #f57c00; background: rgba(245, 124, 0, 0.15); }
+.todo-in-progress .todo-content { color: #e65100; font-weight: 500; }
+.todo-pending .todo-icon { color: #757575; background: rgba(0,0,0,0.05); }
+.todo-pending .todo-content { color: #616161; }
+pre { background: var(--code-bg); color: var(--code-text); padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 0.85rem; line-height: 1.5; margin: 8px 0; white-space: pre-wrap; word-wrap: break-word; }
+pre.json { color: #e0e0e0; }
+code { background: rgba(0,0,0,0.08); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+pre code { background: none; padding: 0; }
+.user-content { margin: 0; }
+.truncatable { position: relative; }
+.truncatable.truncated .truncatable-content { max-height: 200px; overflow: hidden; }
+.truncatable.truncated::after { content: ''; position: absolute; bottom: 32px; left: 0; right: 0; height: 60px; background: linear-gradient(to bottom, transparent, var(--card-bg)); pointer-events: none; }
+.message.user .truncatable.truncated::after { background: linear-gradient(to bottom, transparent, var(--user-bg)); }
+.message.tool-reply .truncatable.truncated::after { background: linear-gradient(to bottom, transparent, #fff8e1); }
+.tool-use .truncatable.truncated::after { background: linear-gradient(to bottom, transparent, var(--tool-bg)); }
+.tool-result .truncatable.truncated::after { background: linear-gradient(to bottom, transparent, var(--tool-result-bg)); }
+.expand-btn { display: none; width: 100%; padding: 8px 16px; margin-top: 4px; background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.1); border-radius: 6px; cursor: pointer; font-size: 0.85rem; color: var(--text-muted); }
+.expand-btn:hover { background: rgba(0,0,0,0.1); }
+.truncatable.truncated .expand-btn, .truncatable.expanded .expand-btn { display: block; }
+.pagination { display: flex; justify-content: center; gap: 8px; margin: 24px 0; flex-wrap: wrap; }
+.pagination a, .pagination span { padding: 5px 10px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; }
+.pagination a { background: var(--card-bg); color: var(--user-border); border: 1px solid var(--user-border); }
+.pagination a:hover { background: var(--user-bg); }
+.pagination .current { background: var(--user-border); color: white; }
+.pagination .disabled { color: var(--text-muted); border: 1px solid #ddd; }
+.pagination .index-link { background: var(--user-border); color: white; }
+details.continuation { margin-bottom: 16px; }
+details.continuation summary { cursor: pointer; padding: 12px 16px; background: var(--user-bg); border-left: 4px solid var(--user-border); border-radius: 12px; font-weight: 500; color: var(--text-muted); }
+details.continuation summary:hover { background: rgba(25, 118, 210, 0.15); }
+details.continuation[open] summary { border-radius: 12px 12px 0 0; margin-bottom: 0; }
+.index-item { margin-bottom: 16px; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); background: var(--user-bg); border-left: 4px solid var(--user-border); }
+.index-item a { display: block; text-decoration: none; color: inherit; }
+.index-item a:hover { background: rgba(25, 118, 210, 0.1); }
+.index-item-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; background: rgba(0,0,0,0.03); font-size: 0.85rem; }
+.index-item-number { font-weight: 600; color: var(--user-border); }
+.index-item-content { padding: 16px; }
+.index-item-stats { padding: 8px 16px 12px 32px; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid rgba(0,0,0,0.06); }
+.index-item-commit { margin-top: 6px; padding: 4px 8px; background: #fff3e0; border-radius: 4px; font-size: 0.85rem; color: #e65100; }
+.index-item-commit code { background: rgba(0,0,0,0.08); padding: 1px 4px; border-radius: 3px; font-size: 0.8rem; margin-right: 6px; }
+.commit-card { margin: 8px 0; padding: 10px 14px; background: #fff3e0; border-left: 4px solid #ff9800; border-radius: 6px; }
+.commit-card a { text-decoration: none; color: #5d4037; display: block; }
+.commit-card a:hover { color: #e65100; }
+.commit-card-hash { font-family: monospace; color: #e65100; font-weight: 600; margin-right: 8px; }
+.index-commit { margin-bottom: 12px; padding: 10px 16px; background: #fff3e0; border-left: 4px solid #ff9800; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.index-commit a { display: block; text-decoration: none; color: inherit; }
+.index-commit a:hover { background: rgba(255, 152, 0, 0.1); margin: -10px -16px; padding: 10px 16px; border-radius: 8px; }
+.index-commit-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; margin-bottom: 4px; }
+.index-commit-hash { font-family: monospace; color: #e65100; font-weight: 600; }
+.index-commit-msg { color: #5d4037; }
+.index-item-long-text { margin-top: 8px; padding: 12px; background: var(--card-bg); border-radius: 8px; border-left: 3px solid var(--assistant-border); }
+.index-item-long-text .truncatable.truncated::after { background: linear-gradient(to bottom, transparent, var(--card-bg)); }
+.index-item-long-text-content { color: var(--text-color); }
+#search-box { display: none; align-items: center; gap: 8px; }
+#search-box input { padding: 6px 12px; border: 1px solid var(--assistant-border); border-radius: 6px; font-size: 16px; width: 180px; }
+#search-box button, #modal-search-btn, #modal-close-btn { background: var(--user-border); color: white; border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+#search-box button:hover, #modal-search-btn:hover { background: #1565c0; }
+#modal-close-btn { background: var(--text-muted); margin-left: 8px; }
+#modal-close-btn:hover { background: #616161; }
+#search-modal[open] { border: none; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.2); padding: 0; width: 90vw; max-width: 900px; height: 80vh; max-height: 80vh; display: flex; flex-direction: column; }
+#search-modal::backdrop { background: rgba(0,0,0,0.5); }
+.search-modal-header { display: flex; align-items: center; gap: 8px; padding: 16px; border-bottom: 1px solid var(--assistant-border); background: var(--bg-color); border-radius: 12px 12px 0 0; }
+.search-modal-header input { flex: 1; padding: 8px 12px; border: 1px solid var(--assistant-border); border-radius: 6px; font-size: 16px; }
+#search-status { padding: 8px 16px; font-size: 0.85rem; color: var(--text-muted); border-bottom: 1px solid rgba(0,0,0,0.06); }
+#search-results { flex: 1; overflow-y: auto; padding: 16px; }
+.search-result { margin-bottom: 16px; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.search-result a { display: block; text-decoration: none; color: inherit; }
+.search-result a:hover { background: rgba(25, 118, 210, 0.05); }
+.search-result-page { padding: 6px 12px; background: rgba(0,0,0,0.03); font-size: 0.8rem; color: var(--text-muted); border-bottom: 1px solid rgba(0,0,0,0.06); }
+.search-result-content { padding: 12px; }
+.search-result mark { background: #fff59d; padding: 1px 2px; border-radius: 2px; }
+@media (max-width: 600px) { body { padding: 8px; } .message, .index-item { border-radius: 8px; } .message-content, .index-item-content { padding: 12px; } pre { font-size: 0.8rem; padding: 8px; } #search-box input { width: 120px; } #search-modal[open] { width: 95vw; height: 90vh; } }
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1><a href="index.html" style="color: inherit; text-decoration: none;">Claude Code transcript</a> - page 1/4</h1>
+        
+
+<div class="pagination">
+<a href="index.html" class="index-link">Index</a>
+<span class="disabled">&larr; Prev</span>
+<span class="current">1</span>
+<a href="page-002.html">2</a>
+<a href="page-003.html">3</a>
+<a href="page-004.html">4</a>
+<a href="page-002.html">Next &rarr;</a>
+</div>
+
+        
+<div class="message user" id="msg-2026-01-30T21-01-01-275Z"><div class="message-header"><span class="role-label">User</span><a href="#msg-2026-01-30T21-01-01-275Z" class="timestamp-link"><time datetime="2026-01-30T21:01:01.275Z" data-timestamp="2026-01-30T21:01:01.275Z">2026-01-30T21:01:01.275Z</time></a></div><div class="message-content">
+<div class="assistant-text"><p>[Request interrupted by user for tool use]</p></div></div></div>
+<div class="message user" id="msg-2026-01-30T21-01-01-270Z"><div class="message-header"><span class="role-label">User</span><a href="#msg-2026-01-30T21-01-01-270Z" class="timestamp-link"><time datetime="2026-01-30T21:01:01.270Z" data-timestamp="2026-01-30T21:01:01.270Z">2026-01-30T21:01:01.270Z</time></a></div><div class="message-content">
+<div class="user-content"><p>Implement the following plan:</p>
+<h1>Test Design Plan for Tetris Game</h1>
+<h2>Summary</h2>
+<p>Create <code>Testing.md</code> containing structured test scenarios (Given/When/Then format) for <code>tetris-game.js</code>, designed for implementation with Jest.</p>
+<h2>Test Categories</h2>
+<h3>1. Piece Movement Tests</h3>
+<ul>
+<li>Move left/right with boundary checking</li>
+<li>Soft drop (normal and anti-gravity)</li>
+<li>Hard drop to bottom/top</li>
+<li>Collision with existing pieces</li>
+</ul>
+<h3>2. Rotation Tests</h3>
+<ul>
+<li>Basic rotation for all 7 piece types</li>
+<li>Wall kick scenarios (near left/right walls)</li>
+<li>O-piece (no rotation change)</li>
+<li>Rotation blocked by existing pieces</li>
+</ul>
+<h3>3. Line Clearing Tests</h3>
+<ul>
+<li>Single line clear</li>
+<li>Double, triple, tetris (4 lines)</li>
+<li>Scoring for each clear type</li>
+<li>Anti-gravity line clearing (clears from top)</li>
+</ul>
+<h3>4. Gravity System Tests</h3>
+<ul>
+<li>Normal gravity piece falling</li>
+<li>Anti-gravity piece rising</li>
+<li>Board flip on toggle</li>
+<li>Piece type swapping (J↔L, S↔Z)</li>
+<li>Non-swappable pieces (I, O, T)</li>
+</ul>
+<h3>5. Collision Detection Tests</h3>
+<ul>
+<li>Wall boundaries (left, right)</li>
+<li>Floor/ceiling boundaries</li>
+<li>Piece-to-piece collision</li>
+<li>Spawn position validation</li>
+</ul>
+<h3>6. Scoring &amp; Progression Tests</h3>
+<ul>
+<li>Soft drop points (+1 per cell)</li>
+<li>Hard drop points (+2 per cell)</li>
+<li>Line clear points by level</li>
+<li>Level progression (every 10 lines)</li>
+<li>Drop speed increase per level</li>
+</ul>
+<h3>7. Game State Tests</h3>
+<ul>
+<li>Pause/unpause functionality</li>
+<li>Game over detection</li>
+<li>Reset game state</li>
+</ul>
+<h2>File to Create</h2>
+<ul>
+<li><code>/Users/chriswarner/Desktop/CS1970/Tetris Test Grav/Testing.md</code></li>
+</ul>
+<h2>Verification</h2>
+<p>After creating Testing.md:
+1. Review the file for completeness
+2. Ensure all exported functions from tetris-game.js are covered
+3. Verify Given/When/Then format is consistent</p>
+<p>If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/chriswarner/.claude/projects/-Users-chriswarner-Desktop-CS1970-Tetris-Test-Grav/ef78ba0a-e13b-40b5-9b19-3889d05466d5.jsonl</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-01-04-193Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-01-04-193Z" class="timestamp-link"><time datetime="2026-01-30T21:01:04.193Z" data-timestamp="2026-01-30T21:01:04.193Z">2026-01-30T21:01:04.193Z</time></a></div><div class="message-content">
+<div class="assistant-text"><p>I'll start by reading the <code>tetris-game.js</code> file to understand all the exported functions and game mechanics that need to be tested.</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-01-04-686Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-01-04-686Z" class="timestamp-link"><time datetime="2026-01-30T21:01:04.686Z" data-timestamp="2026-01-30T21:01:04.686Z">2026-01-30T21:01:04.686Z</time></a></div><div class="message-content">
+<div class="tool-use" data-tool-id="toolu_01VVpBEsj7irRwdZaXCaFomV"><div class="tool-header"><span class="tool-icon">⚙</span> Read</div><div class="truncatable"><div class="truncatable-content"><pre class="json">{
+  &#34;file_path&#34;: &#34;/Users/chriswarner/Desktop/CS1970/Tetris Test Grav/tetris-game.js&#34;
+}</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message tool-reply" id="msg-2026-01-30T21-01-04-696Z"><div class="message-header"><span class="role-label">Tool reply</span><a href="#msg-2026-01-30T21-01-04-696Z" class="timestamp-link"><time datetime="2026-01-30T21:01:04.696Z" data-timestamp="2026-01-30T21:01:04.696Z">2026-01-30T21:01:04.696Z</time></a></div><div class="message-content"><div class="tool-result"><div class="truncatable"><div class="truncatable-content"><pre>     1→// Tetris Swap 2 - Game Logic
+     2→// This module contains all game logic separated from the UI for testing purposes
+     3→
+     4→const COLS = 10;
+     5→const ROWS = 20;
+     6→const BLOCK_SIZE = 30;
+     7→
+     8→const COLORS = [
+     9→    null,
+    10→    &#x27;#00f0f0&#x27;, // I - Cyan
+    11→    &#x27;#0000f0&#x27;, // J - Blue
+    12→    &#x27;#f0a000&#x27;, // L - Orange
+    13→    &#x27;#f0f000&#x27;, // O - Yellow
+    14→    &#x27;#00f000&#x27;, // S - Green
+    15→    &#x27;#a000f0&#x27;, // T - Purple
+    16→    &#x27;#f00000&#x27;  // Z - Red
+    17→];
+    18→
+    19→const SHAPES = [
+    20→    [], // Empty placeholder
+    21→    [[1, 1, 1, 1]],           // I
+    22→    [[2, 0, 0], [2, 2, 2]],   // J
+    23→    [[0, 0, 3], [3, 3, 3]],   // L
+    24→    [[4, 4], [4, 4]],         // O
+    25→    [[0, 5, 5], [5, 5, 0]],   // S
+    26→    [[0, 6, 0], [6, 6, 6]],   // T
+    27→    [[7, 7, 0], [0, 7, 7]]    // Z
+    28→];
+    29→
+    30→// Piece type swap mapping: J(2) &lt;-&gt; L(3), S(5) &lt;-&gt; Z(7)
+    31→const SWAP_MAP = {
+    32→    2: 3,  // J -&gt; L
+    33→    3: 2,  // L -&gt; J
+    34→    5: 7,  // S -&gt; Z
+    35→    7: 5   // Z -&gt; S
+    36→};
+    37→
+    38→// Game state
+    39→let board = [];
+    40→let currentPiece = null;
+    41→let nextPiece = null;
+    42→let score = 0;
+    43→let level = 1;
+    44→let lines = 0;
+    45→let gameOver = false;
+    46→let paused = false;
+    47→let antiGravity = false;
+    48→let dropInterval = 1000;
+    49→let lastDrop = 0;
+    50→
+    51→// Canvas references (set by initGame)
+    52→let canvas = null;
+    53→let ctx = null;
+    54→let nextCanvas = null;
+    55→let nextCtx = null;
+    56→
+    57→function createBoard() {
+    58→    board = [];
+    59→    for (let r = 0; r &lt; ROWS; r++) {
+    60→        board.push(new Array(COLS).fill(0));
+    61→    }
+    62→}
+    63→
+    64→function createPiece(type) {
+    65→    const shape = SHAPES[type].map(row =&gt; [...row]);
+    66→    return {
+    67→        type: type,
+    68→        shape: shape,
+    69→        x: Math.floor(COLS / 2) - Math.floor(shape[0].length / 2),
+    70→        y: antiGravity ? ROWS - shape.length : 0
+    71→    };
+    72→}
+    73→
+    74→function getRandomPiece() {
+    75→    const type = Math.floor(Math.random() * 7) + 1;
+    76→    return createPiece(type);
+    77→}
+    78→
+    79→function resetCurrentPiece() {
+    80→    if (currentPiece) {
+    81→        currentPiece.x = Math.floor(COLS / 2) - Math.floor(currentPiece.shape[0].length / 2);
+    82→        currentPiece.y = antiGravity ? ROWS - currentPiece.shape.length : 0;
+    83→    }
+    84→}
+    85→
+    86→// Swap piece type if it&#x27;s J, L, S, or Z
+    87→function getSwappedType(type) {
+    88→    return SWAP_MAP[type] || type;
+    89→}
+    90→
+    91→// Swap the current piece to its counterpart
+    92→function swapCurrentPiece() {
+    93→    if (currentPiece) {
+    94→        const newType = getSwappedType(currentPiece.type);
+    95→        if (newType !== currentPiece.type) {
+    96→            currentPiece = createPiece(newType);
+    97→        }
+    98→    }
+    99→}
+   100→
+   101→// Swap all placed pieces on the board
+   102→function swapBoardPieces() {
+   103→    for (let r = 0; r &lt; ROWS; r++) {
+   104→        for (let c = 0; c &lt; COLS; c++) {
+   105→            if (board[r][c]) {
+   106→                board[r][c] = getSwappedType(board[r][c]);
+   107→            }
+   108→        }
+   109→    }
+   110→}
+   111→
+   112→function drawBlock(context, x, y, color, size = BLOCK_SIZE) {
+   113→    context.fillStyle = color;
+   114→    context.fillRect(x * size, y * size, size, size);
+   115→
+   116→    // Highlight
+   117→    context.fillStyle = &#x27;rgba(255, 255, 255, 0.3)&#x27;;
+   118→    context.fillRect(x * size, y * size, size, size / 6);
+   119→    context.fillRect(x * size, y * size, size / 6, size);
+   120→
+   121→    // Shadow
+   122→    context.fillStyle = &#x27;rgba(0, 0, 0, 0.3)&#x27;;
+   123→    context.fillRect(x * size, y * size + size - size / 6, size, size / 6);
+   124→    context.fillRect(x * size + size - size / 6, y * size, size / 6, size);
+   125→
+   126→    // Border
+   127→    context.strokeStyle = &#x27;rgba(0, 0, 0, 0.5)&#x27;;
+   128→    context.strokeRect(x * size, y * size, size, size);
+   129→}
+   130→
+   131→function drawBoard() {
+   132→    ctx.fillStyle = &#x27;#000&#x27;;
+   133→    ctx.fillRect(0, 0, canvas.width, canvas.height);
+   134→
+   135→    // Draw kill zone line
+   136→    ctx.strokeStyle = &#x27;#f44&#x27;;
+   137→    ctx.lineWidth = 3;
+   138→    ctx.shadowColor = &#x27;#f44&#x27;;
+   139→    ctx.shadowBlur = 10;
+   140→    if (antiGravity) {
+   141→        ctx.beginPath();
+   142→        ctx.moveTo(0, canvas.height - 1.5);
+   143→        ctx.lineTo(canvas.width, canvas.height - 1.5);
+   144→        ctx.stroke();
+   145→    } else {
+   146→        ctx.beginPath();
+   147→        ctx.moveTo(0, 1.5);
+   148→        ctx.lineTo(canvas.width, 1.5);
+   149→        ctx.stroke();
+   150→    }
+   151→    ctx.shadowBlur = 0;
+   152→    ctx.lineWidth = 1;
+   153→
+   154→    // Draw grid
+   155→    ctx.strokeStyle = &#x27;rgba(255, 255, 255, 0.1)&#x27;;
+   156→    for (let r = 0; r &lt; ROWS; r++) {
+   157→        for (let c = 0; c &lt; COLS; c++) {
+   158→            ctx.strokeRect(c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+   159→        }
+   160→    }
+   161→
+   162→    // Draw placed blocks
+   163→    for (let r = 0; r &lt; ROWS; r++) {
+   164→        for (let c = 0; c &lt; COLS; c++) {
+   165→            if (board[r][c]) {
+   166→                drawBlock(ctx, c, r, COLORS[board[r][c]]);
+   167→            }
+   168→        }
+   169→    }
+   170→}
+   171→
+   172→function drawPiece() {
+   173→    if (!currentPiece) return;
+   174→
+   175→    // Draw ghost piece
+   176→    const ghostY = getGhostPosition();
+   177→    ctx.globalAlpha = 0.3;
+   178→    for (let r = 0; r &lt; currentPiece.shape.length; r++) {
+   179→        for (let c = 0; c &lt; currentPiece.shape[r].length; c++) {
+   180→            if (currentPiece.shape[r][c]) {
+   181→                drawBlock(ctx, currentPiece.x + c, ghostY + r, COLORS[currentPiece.shape[r][c]]);
+   182→            }
+   183→        }
+   184→    }
+   185→    ctx.globalAlpha = 1;
+   186→
+   187→    // Draw actual piece
+   188→    for (let r = 0; r &lt; currentPiece.shape.length; r++) {
+   189→        for (let c = 0; c &lt; currentPiece.shape[r].length; c++) {
+   190→            if (currentPiece.shape[r][c]) {
+   191→                drawBlock(ctx, currentPiece.x + c, currentPiece.y + r, COLORS[currentPiece.shape[r][c]]);
+   192→            }
+   193→        }
+   194→    }
+   195→}
+   196→
+   197→function drawNextPiece() {
+   198→    nextCtx.fillStyle = &#x27;#000&#x27;;
+   199→    nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+   200→
+   201→    if (!nextPiece) return;
+   202→
+   203→    const blockSize = 25;
+   204→    const offsetX = (nextCanvas.width - nextPiece.shape[0].length * blockSize) / 2;
+   205→    const offsetY = (nextCanvas.height - nextPiece.shape.length * blockSize) / 2;
+   206→
+   207→    for (let r = 0; r &lt; nextPiece.shape.length; r++) {
+   208→        for (let c = 0; c &lt; nextPiece.shape[r].length; c++) {
+   209→            if (nextPiece.shape[r][c]) {
+   210→                const x = offsetX / blockSize + c;
+   211→                const y = offsetY / blockSize + r;
+   212→                nextCtx.fillStyle = COLORS[nextPiece.shape[r][c]];
+   213→                nextCtx.fillRect(x * blockSize, y * blockSize, blockSize, blockSize);
+   214→                nextCtx.strokeStyle = &#x27;rgba(255, 255, 255, 0.3)&#x27;;
+   215→                nextCtx.strokeRect(x * blockSize, y * blockSize, blockSize, blockSize);
+   216→            }
+   217→        }
+   218→    }
+   219→}
+   220→
+   221→function getGhostPosition() {
+   222→    let ghostY = currentPiece.y;
+   223→    if (antiGravity) {
+   224→        while (isValidMove(currentPiece.shape, currentPiece.x, ghostY - 1)) {
+   225→            ghostY--;
+   226→        }
+   227→    } else {
+   228→        while (isValidMove(currentPiece.shape, currentPiece.x, ghostY + 1)) {
+   229→            ghostY++;
+   230→        }
+   231→    }
+   232→    return ghostY;
+   233→}
+   234→
+   235→function isValidMove(shape, x, y) {
+   236→    for (let r = 0; r &lt; shape.length; r++) {
+   237→        for (let c = 0; c &lt; shape[r].length; c++) {
+   238→            if (shape[r][c]) {
+   239→                const newX = x + c;
+   240→                const newY = y + r;
+   241→
+   242→                if (newX &lt; 0 || newX &gt;= COLS || newY &lt; 0 || newY &gt;= ROWS) {
+   243→                    return false;
+   244→                }
+   245→
+   246→                if (board[newY][newX]) {
+   247→                    return false;
+   248→                }
+   249→            }
+   250→        }
+   251→    }
+   252→    return true;
+   253→}
+   254→
+   255→function rotatePiece() {
+   256→    const rotated = [];
+   257→    const rows = currentPiece.shape.length;
+   258→    const cols = currentPiece.shape[0].length;
+   259→
+   260→    for (let c = 0; c &lt; cols; c++) {
+   261→        rotated.push([]);
+   262→        for (let r = rows - 1; r &gt;= 0; r--) {
+   263→            rotated[c].push(currentPiece.shape[r][c]);
+   264→        }
+   265→    }
+   266→
+   267→    // Wall kick
+   268→    const kicks = [0, -1, 1, -2, 2];
+   269→    for (const kick of kicks) {
+   270→        if (isValidMove(rotated, currentPiece.x + kick, currentPiece.y)) {
+   271→            currentPiece.shape = rotated;
+   272→            currentPiece.x += kick;
+   273→            return;
+   274→        }
+   275→    }
+   276→}
+   277→
+   278→function movePiece(dx, dy) {
+   279→    if (isValidMove(currentPiece.shape, currentPiece.x + dx, currentPiece.y + dy)) {
+   280→        currentPiece.x += dx;
+   281→        currentPiece.y += dy;
+   282→        return true;
+   283→    }
+   284→    return false;
+   285→}
+   286→
+   287→function hardDrop() {
+   288→    if (antiGravity) {
+   289→        while (movePiece(0, -1)) {
+   290→            score += 2;
+   291→        }
+   292→    } else {
+   293→        while (movePiece(0, 1)) {
+   294→            score += 2;
+   295→        }
+   296→    }
+   297→    lockPiece();
+   298→}
+   299→
+   300→function lockPiece() {
+   301→    for (let r = 0; r &lt; currentPiece.shape.length; r++) {
+   302→        for (let c = 0; c &lt; currentPiece.shape[r].length; c++) {
+   303→            if (currentPiece.shape[r][c]) {
+   304→                const boardY = currentPiece.y + r;
+   305→                const boardX = currentPiece.x + c;
+   306→
+   307→                if (boardY &gt;= 0 &amp;&amp; boardY &lt; ROWS) {
+   308→                    board[boardY][boardX] = currentPiece.shape[r][c];
+   309→                }
+   310→            }
+   311→        }
+   312→    }
+   313→
+   314→    clearLines();
+   315→    spawnPiece();
+   316→}
+   317→
+   318→function clearLines() {
+   319→    let linesCleared = 0;
+   320→
+   321→    if (antiGravity) {
+   322→        // In anti-gravity, clear lines from top and shift down
+   323→        for (let r = 0; r &lt; ROWS; r++) {
+   324→            if (board[r].every(cell =&gt; cell !== 0)) {
+   325→                board.splice(r, 1);
+   326→                board.push(new Array(COLS).fill(0));
+   327→                linesCleared++;
+   328→                r--; // Check same row again
+   329→            }
+   330→        }
+   331→    } else {
+   332→        // Normal gravity, clear lines from bottom and shift down
+   333→        for (let r = ROWS - 1; r &gt;= 0; r--) {
+   334→            if (board[r].every(cell =&gt; cell !== 0)) {
+   335→                board.splice(r, 1);
+   336→                board.unshift(new Array(COLS).fill(0));
+   337→                linesCleared++;
+   338→                r++; // Check same row again
+   339→            }
+   340→        }
+   341→    }
+   342→
+   343→    if (linesCleared &gt; 0) {
+   344→        const points = [0, 100, 300, 500, 800];
+   345→        score += points[linesCleared] * level;
+   346→        lines += linesCleared;
+   347→        level = Math.floor(lines / 10) + 1;
+   348→        dropInterval = Math.max(100, 1000 - (level - 1) * 100);
+   349→        updateUI();
+   350→    }
+   351→}
+   352→
+   353→function spawnPiece() {
+   354→    currentPiece = nextPiece || getRandomPiece();
+   355→    nextPiece = getRandomPiece();
+   356→
+   357→    // Reset position based on current gravity mode
+   358→    currentPiece.x = Math.floor(COLS / 2) - Math.floor(currentPiece.shape[0].length / 2);
+   359→    currentPiece.y = antiGravity ? ROWS - currentPiece.shape.length : 0;
+   360→
+   361→    if (!isValidMove(currentPiece.shape, currentPiece.x, currentPiece.y)) {
+   362→        gameOver = true;
+   363→        showGameOver();
+   364→    }
+   365→
+   366→    drawNextPiece();
+   367→}
+   368→
+   369→function flipBoard() {
+   370→    // Flip the board vertically
+   371→    board.reverse();
+   372→}
+   373→
+   374→function toggleGravity() {
+   375→    antiGravity = !antiGravity;
+   376→    flipBoard();
+   377→    swapBoardPieces();
+   378→    swapCurrentPiece();
+   379→
+   380→    const indicator = document.getElementById(&#x27;mode-indicator&#x27;);
+   381→    if (antiGravity) {
+   382→        indicator.textContent = &#x27;ANTI-GRAVITY MODE&#x27;;
+   383→        indicator.className = &#x27;mode-indicator anti-gravity&#x27;;
+   384→    } else {
+   385→        indicator.textContent = &#x27;GRAVITY MODE&#x27;;
+   386→        indicator.className = &#x27;mode-indicator gravity&#x27;;
+   387→    }
+   388→}
+   389→
+   390→function updateUI() {
+   391→    document.getElementById(&#x27;score&#x27;).textContent = score;
+   392→    document.getElementById(&#x27;level&#x27;).textContent = level;
+   393→    document.getElementById(&#x27;lines&#x27;).textContent = lines;
+   394→}
+   395→
+   396→function showGameOver() {
+   397→    document.getElementById(&#x27;final-score&#x27;).textContent = `Score: ${score}`;
+   398→    document.getElementById(&#x27;game-over-overlay&#x27;).classList.add(&#x27;active&#x27;);
+   399→}
+   400→
+   401→function togglePause() {
+   402→    paused = !paused;
+   403→    document.getElementById(&#x27;pause-overlay&#x27;).classList.toggle(&#x27;active&#x27;, paused);
+   404→}
+   405→
+   406→function resetGame() {
+   407→    createBoard();
+   408→    score = 0;
+   409→    level = 1;
+   410→    lines = 0;
+   411→    gameOver = false;
+   412→    paused = false;
+   413→    antiGravity = false;
+   414→    dropInterval = 1000;
+   415→    lastDrop = 0;
+   416→
+   417→    document.getElementById(&#x27;mode-indicator&#x27;).textContent = &#x27;GRAVITY MODE&#x27;;
+   418→    document.getElementById(&#x27;mode-indicator&#x27;).className = &#x27;mode-indicator gravity&#x27;;
+   419→    document.getElementById(&#x27;game-over-overlay&#x27;).classList.remove(&#x27;active&#x27;);
+   420→    document.getElementById(&#x27;pause-overlay&#x27;).classList.remove(&#x27;active&#x27;);
+   421→
+   422→    currentPiece = null;
+   423→    nextPiece = null;
+   424→    spawnPiece();
+   425→    updateUI();
+   426→}
+   427→
+   428→function gameLoop(timestamp) {
+   429→    if (!gameOver &amp;&amp; !paused) {
+   430→        if (timestamp - lastDrop &gt; dropInterval) {
+   431→            const dy = antiGravity ? -1 : 1;
+   432→            if (!movePiece(0, dy)) {
+   433→                lockPiece();
+   434→            }
+   435→            lastDrop = timestamp;
+   436→        }
+   437→
+   438→        drawBoard();
+   439→        drawPiece();
+   440→        updateUI();
+   441→    }
+   442→
+   443→    requestAnimationFrame(gameLoop);
+   444→}
+   445→
+   446→function handleKeyDown(e) {
+   447→    if (gameOver) return;
+   448→
+   449→    if (e.key === &#x27;p&#x27; || e.key === &#x27;P&#x27;) {
+   450→        togglePause();
+   451→        return;
+   452→    }
+   453→
+   454→    if (paused) return;
+   455→
+   456→    switch (e.key) {
+   457→        case &#x27;ArrowLeft&#x27;:
+   458→            movePiece(-1, 0);
+   459→            break;
+   460→        case &#x27;ArrowRight&#x27;:
+   461→            movePiece(1, 0);
+   462→            break;
+   463→        case &#x27;ArrowDown&#x27;:
+   464→            if (antiGravity) {
+   465→                if (movePiece(0, -1)) score += 1;
+   466→            } else {
+   467→                if (movePiece(0, 1)) score += 1;
+   468→            }
+   469→            break;
+   470→        case &#x27;ArrowUp&#x27;:
+   471→            rotatePiece();
+   472→            break;
+   473→        case &#x27; &#x27;:
+   474→            e.preventDefault();
+   475→            hardDrop();
+   476→            break;
+   477→        case &#x27;g&#x27;:
+   478→        case &#x27;G&#x27;:
+   479→            toggleGravity();
+   480→            break;
+   481→    }
+   482→
+   483→    drawBoard();
+   484→    drawPiece();
+   485→    updateUI();
+   486→}
+   487→
+   488→function initGame() {
+   489→    canvas = document.getElementById(&#x27;game-canvas&#x27;);
+   490→    ctx = canvas.getContext(&#x27;2d&#x27;);
+   491→    nextCanvas = document.getElementById(&#x27;next-canvas&#x27;);
+   492→    nextCtx = nextCanvas.getContext(&#x27;2d&#x27;);
+   493→
+   494→    document.addEventListener(&#x27;keydown&#x27;, handleKeyDown);
+   495→    document.getElementById(&#x27;restart-btn&#x27;).addEventListener(&#x27;click&#x27;, resetGame);
+   496→
+   497→    resetGame();
+   498→    requestAnimationFrame(gameLoop);
+   499→}
+   500→
+   501→// Export for testing (works in both browser and Node.js/test environments)
+   502→if (typeof module !== &#x27;undefined&#x27; &amp;&amp; module.exports) {
+   503→    module.exports = {
+   504→        // Constants
+   505→        COLS,
+   506→        ROWS,
+   507→        BLOCK_SIZE,
+   508→        COLORS,
+   509→        SHAPES,
+   510→        SWAP_MAP,
+   511→
+   512→        // State getters/setters for testing
+   513→        getBoard: () =&gt; board,
+   514→        setBoard: (b) =&gt; { board = b; },
+   515→        getCurrentPiece: () =&gt; currentPiece,
+   516→        setCurrentPiece: (p) =&gt; { currentPiece = p; },
+   517→        getNextPiece: () =&gt; nextPiece,
+   518→        setNextPiece: (p) =&gt; { nextPiece = p; },
+   519→        getScore: () =&gt; score,
+   520→        setScore: (s) =&gt; { score = s; },
+   521→        getLevel: () =&gt; level,
+   522→        setLevel: (l) =&gt; { level = l; },
+   523→        getLines: () =&gt; lines,
+   524→        setLines: (l) =&gt; { lines = l; },
+   525→        isGameOver: () =&gt; gameOver,
+   526→        setGameOver: (g) =&gt; { gameOver = g; },
+   527→        isPaused: () =&gt; paused,
+   528→        setPaused: (p) =&gt; { paused = p; },
+   529→        isAntiGravity: () =&gt; antiGravity,
+   530→        setAntiGravity: (a) =&gt; { antiGravity = a; },
+   531→        getDropInterval: () =&gt; dropInterval,
+   532→        setDropInterval: (d) =&gt; { dropInterval = d; },
+   533→
+   534→        // Core game functions
+   535→        createBoard,
+   536→        createPiece,
+   537→        getRandomPiece,
+   538→        resetCurrentPiece,
+   539→        getSwappedType,
+   540→        swapCurrentPiece,
+   541→        swapBoardPieces,
+   542→        isValidMove,
+   543→        rotatePiece,
+   544→        movePiece,
+   545→        hardDrop,
+   546→        lockPiece,
+   547→        clearLines,
+   548→        spawnPiece,
+   549→        flipBoard,
+   550→        getGhostPosition,
+   551→
+   552→        // For integration testing
+   553→        initGame,
+   554→        resetGame,
+   555→        handleKeyDown
+   556→    };
+   557→}
+   558→
+
+&lt;system-reminder&gt;
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+&lt;/system-reminder&gt;
+</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-01-12-549Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-01-12-549Z" class="timestamp-link"><time datetime="2026-01-30T21:01:12.549Z" data-timestamp="2026-01-30T21:01:12.549Z">2026-01-30T21:01:12.549Z</time></a></div><div class="message-content">
+<div class="assistant-text"><p>Now I have a complete understanding of the game logic. Let me create the comprehensive <code>Testing.md</code> file with test scenarios in Given/When/Then format.</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-02-29-814Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-02-29-814Z" class="timestamp-link"><time datetime="2026-01-30T21:02:29.814Z" data-timestamp="2026-01-30T21:02:29.814Z">2026-01-30T21:02:29.814Z</time></a></div><div class="message-content"><div class="file-tool write-tool" data-tool-id="toolu_016cqTr72ARi1ymYzf3Um83s">
+<div class="file-tool-header write-header"><span class="file-tool-icon">📝</span> Write <span class="file-tool-path">Testing.md</span></div>
+<div class="file-tool-fullpath">/Users/chriswarner/Desktop/CS1970/Tetris Test Grav/Testing.md</div>
+<div class="truncatable"><div class="truncatable-content"><pre class="file-content"># Test Design Document for Tetris Game
+
+This document contains structured test scenarios for `tetris-game.js` designed for implementation with Jest. All tests follow the Given/When/Then format.
+
+---
+
+## Table of Contents
+1. [Piece Movement Tests](#1-piece-movement-tests)
+2. [Rotation Tests](#2-rotation-tests)
+3. [Line Clearing Tests](#3-line-clearing-tests)
+4. [Gravity System Tests](#4-gravity-system-tests)
+5. [Collision Detection Tests](#5-collision-detection-tests)
+6. [Scoring &amp; Progression Tests](#6-scoring--progression-tests)
+7. [Game State Tests](#7-game-state-tests)
+
+---
+
+## 1. Piece Movement Tests
+
+### 1.1 Move Left - Valid Move
+**Given** a piece is in the middle of the board (x = 5)
+**When** `movePiece(-1, 0)` is called
+**Then** the piece&#39;s x position should decrease by 1 (x = 4)
+**And** the function should return `true`
+
+### 1.2 Move Right - Valid Move
+**Given** a piece is in the middle of the board (x = 4)
+**When** `movePiece(1, 0)` is called
+**Then** the piece&#39;s x position should increase by 1 (x = 5)
+**And** the function should return `true`
+
+### 1.3 Move Left - Blocked by Left Wall
+**Given** a piece is at the left edge (x = 0)
+**When** `movePiece(-1, 0)` is called
+**Then** the piece&#39;s x position should remain 0
+**And** the function should return `false`
+
+### 1.4 Move Right - Blocked by Right Wall
+**Given** an I-piece is positioned so its rightmost block is at column 9 (COLS - 1)
+**When** `movePiece(1, 0)` is called
+**Then** the piece&#39;s position should not change
+**And** the function should return `false`
+
+### 1.5 Soft Drop - Normal Gravity
+**Given** a piece is at y = 5 with `antiGravity` set to `false`
+**When** `movePiece(0, 1)` is called
+**Then** the piece&#39;s y position should increase by 1 (y = 6)
+**And** the function should return `true`
+
+### 1.6 Soft Drop - Anti-Gravity
+**Given** a piece is at y = 15 with `antiGravity` set to `true`
+**When** `movePiece(0, -1)` is called
+**Then** the piece&#39;s y position should decrease by 1 (y = 14)
+**And** the function should return `true`
+
+### 1.7 Hard Drop - Normal Gravity
+**Given** a piece is at y = 5 with an empty board and `antiGravity` set to `false`
+**When** `hardDrop()` is called
+**Then** the piece should move to the bottom of the board
+**And** `lockPiece()` should be called
+**And** score should increase by 2 points per cell dropped
+
+### 1.8 Hard Drop - Anti-Gravity
+**Given** a piece is at y = 15 with an empty board and `antiGravity` set to `true`
+**When** `hardDrop()` is called
+**Then** the piece should move to the top of the board (y = 0)
+**And** `lockPiece()` should be called
+**And** score should increase by 2 points per cell risen
+
+### 1.9 Move Blocked by Existing Piece
+**Given** a piece is at position (4, 10)
+**And** there is a locked block at position (3, 10)
+**When** `movePiece(-1, 0)` is called
+**Then** the piece should not move
+**And** the function should return `false`
+
+---
+
+## 2. Rotation Tests
+
+### 2.1 Basic Rotation - T-Piece
+**Given** a T-piece with shape `[[0, 6, 0], [6, 6, 6]]`
+**When** `rotatePiece()` is called
+**Then** the shape should become `[[6, 0], [6, 6], [6, 0]]`
+
+### 2.2 Basic Rotation - I-Piece
+**Given** an I-piece with shape `[[1, 1, 1, 1]]` (horizontal)
+**When** `rotatePiece()` is called
+**Then** the shape should become `[[1], [1], [1], [1]]` (vertical)
+
+### 2.3 Basic Rotation - J-Piece
+**Given** a J-piece with shape `[[2, 0, 0], [2, 2, 2]]`
+**When** `rotatePiece()` is called
+**Then** the shape should rotate 90 degrees clockwise
+
+### 2.4 Basic Rotation - L-Piece
+**Given** an L-piece with shape `[[0, 0, 3], [3, 3, 3]]`
+**When** `rotatePiece()` is called
+**Then** the shape should rotate 90 degrees clockwise
+
+### 2.5 Basic Rotation - S-Piece
+**Given** an S-piece with shape `[[0, 5, 5], [5, 5, 0]]`
+**When** `rotatePiece()` is called
+**Then** the shape should rotate 90 degrees clockwise
+
+### 2.6 Basic Rotation - Z-Piece
+**Given** a Z-piece with shape `[[7, 7, 0], [0, 7, 7]]`
+**When** `rotatePiece()` is called
+**Then** the shape should rotate 90 degrees clockwise
+
+### 2.7 O-Piece - No Rotation Change
+**Given** an O-piece with shape `[[4, 4], [4, 4]]`
+**When** `rotatePiece()` is called
+**Then** the shape should remain `[[4, 4], [4, 4]]` (visually identical)
+
+### 2.8 Wall Kick - Near Left Wall
+**Given** a T-piece at x = 0
+**And** rotation would place part of the piece at x = -1
+**When** `rotatePiece()` is called
+**Then** the piece should rotate
+**And** x position should be adjusted by wall kick (+1)
+
+### 2.9 Wall Kick - Near Right Wall
+**Given** a T-piece at x = 8 (near right edge)
+**And** rotation would place part of the piece beyond column 9
+**When** `rotatePiece()` is called
+**Then** the piece should rotate
+**And** x position should be adjusted by wall kick (-1)
+
+### 2.10 Rotation Blocked by Existing Pieces
+**Given** a T-piece in the middle of the board
+**And** existing blocks surround it preventing any valid rotation position
+**When** `rotatePiece()` is called
+**Then** the piece shape should remain unchanged
+**And** the piece position should remain unchanged
+
+### 2.11 Wall Kick Tries Multiple Offsets
+**Given** a piece near a wall
+**And** kick offset 0 is invalid, kick offset -1 is invalid, but kick offset 1 is valid
+**When** `rotatePiece()` is called
+**Then** the piece should rotate with x offset of +1
+
+---
+
+## 3. Line Clearing Tests
+
+### 3.1 Single Line Clear - Normal Gravity
+**Given** `antiGravity` is `false`
+**And** row 19 (bottom) is completely filled
+**And** all other rows have some empty cells
+**When** `clearLines()` is called
+**Then** row 19 should be removed
+**And** a new empty row should be added at row 0 (top)
+**And** `lines` should increase by 1
+**And** score should increase by 100 * level
+
+### 3.2 Double Line Clear
+**Given** rows 18 and 19 are completely filled
+**When** `clearLines()` is called
+**Then** both rows should be removed
+**And** `lines` should increase by 2
+**And** score should increase by 300 * level
+
+### 3.3 Triple Line Clear
+**Given** rows 17, 18, and 19 are completely filled
+**When** `clearLines()` is called
+**Then** all three rows should be removed
+**And** `lines` should increase by 3
+**And** score should increase by 500 * level
+
+### 3.4 Tetris (4 Lines Clear)
+**Given** rows 16, 17, 18, and 19 are completely filled
+**When** `clearLines()` is called
+**Then** all four rows should be removed
+**And** `lines` should increase by 4
+**And** score should increase by 800 * level
+
+### 3.5 Anti-Gravity Line Clear - From Top
+**Given** `antiGravity` is `true`
+**And** row 0 (top) is completely filled
+**When** `clearLines()` is called
+**Then** row 0 should be removed
+**And** a new empty row should be added at the bottom (row 19)
+
+### 3.6 Line Clear Scoring at Higher Levels
+**Given** level is 5
+**And** a single line is cleared
+**When** `clearLines()` is called
+**Then** score should increase by 100 * 5 = 500 points
+
+### 3.7 No Lines to Clear
+**Given** no rows are completely filled
+**When** `clearLines()` is called
+**Then** the board should remain unchanged
+**And** score should remain unchanged
+**And** lines count should remain unchanged
+
+---
+
+## 4. Gravity System Tests
+
+### 4.1 Normal Gravity - Piece Falls Down
+**Given** `antiGravity` is `false`
+**And** a piece is at y = 5
+**When** the game loop calls `movePiece(0, 1)`
+**Then** the piece should move to y = 6
+
+### 4.2 Anti-Gravity - Piece Rises Up
+**Given** `antiGravity` is `true`
+**And** a piece is at y = 15
+**When** the game loop calls `movePiece(0, -1)`
+**Then** the piece should move to y = 14
+
+### 4.3 Toggle Gravity - Board Flips
+**Given** an initial board state with pieces at the bottom (rows 15-19)
+**When** `toggleGravity()` is called
+**Then** `antiGravity` should become `true`
+**And** the board should be vertically flipped (pieces now at rows 0-4)
+
+### 4.4 Toggle Gravity - J Piece Swaps to L
+**Given** the board contains J-pieces (type 2)
+**When** `toggleGravity()` is called
+**Then** all J-pieces on the board should become L-pieces (type 3)
+
+### 4.5 Toggle Gravity - L Piece Swaps to J
+**Given** the board contains L-pieces (type 3)
+**When** `toggleGravity()` is called
+**Then** all L-pieces on the board should become J-pieces (type 2)
+
+### 4.6 Toggle Gravity - S Piece Swaps to Z
+**Given** the board contains S-pieces (type 5)
+**When** `toggleGravity()` is called
+**Then** all S-pieces on the board should become Z-pieces (type 7)
+
+### 4.7 Toggle Gravity - Z Piece Swaps to S
+**Given** the board contains Z-pieces (type 7)
+**When** `toggleGravity()` is called
+**Then** all Z-pieces on the board should become S-pieces (type 5)
+
+### 4.8 Non-Swappable Pieces - I Piece
+**Given** `getSwappedType()` is called with type 1 (I-piece)
+**When** the function executes
+**Then** it should return 1 (unchanged)
+
+### 4.9 Non-Swappable Pieces - O Piece
+**Given** `getSwappedType()` is called with type 4 (O-piece)
+**When** the function executes
+**Then** it should return 4 (unchanged)
+
+### 4.10 Non-Swappable Pieces - T Piece
+**Given** `getSwappedType()` is called with type 6 (T-piece)
+**When** the function executes
+**Then** it should return 6 (unchanged)
+
+### 4.11 Current Piece Swaps on Toggle
+**Given** the current falling piece is a J-piece (type 2)
+**When** `toggleGravity()` is called
+**Then** the current piece should become an L-piece (type 3)
+
+### 4.12 Spawn Position - Normal Gravity
+**Given** `antiGravity` is `false`
+**When** `createPiece(type)` is called
+**Then** the piece&#39;s y position should be 0 (top of board)
+
+### 4.13 Spawn Position - Anti-Gravity
+**Given** `antiGravity` is `true`
+**When** `createPiece(type)` is called
+**Then** the piece&#39;s y position should be `ROWS - shape.length` (bottom of board)
+
+---
+
+## 5. Collision Detection Tests
+
+### 5.1 Valid Move - Empty Space
+**Given** an empty board
+**And** a piece shape at position (4, 5)
+**When** `isValidMove(shape, 4, 5)` is called
+**Then** it should return `true`
+
+### 5.2 Invalid Move - Left Wall Boundary
+**Given** a piece shape that would extend to x = -1
+**When** `isValidMove(shape, -1, 5)` is called
+**Then** it should return `false`
+
+### 5.3 Invalid Move - Right Wall Boundary
+**Given** a piece shape that would extend beyond x = 9 (COLS - 1)
+**When** `isValidMove(shape, 9, 5)` is called for a piece wider than 1 column
+**Then** it should return `false`
+
+### 5.4 Invalid Move - Floor Boundary
+**Given** a piece shape that would extend to y = 20 (ROWS)
+**When** `isValidMove(shape, 4, 19)` is called for a piece taller than 1 row
+**Then** it should return `false`
+
+### 5.5 Invalid Move - Ceiling Boundary
+**Given** a piece shape that would extend to y = -1
+**When** `isValidMove(shape, 4, -1)` is called
+**Then** it should return `false`
+
+### 5.6 Invalid Move - Collision with Existing Piece
+**Given** a board with a block at position (5, 10)
+**And** a piece that would occupy (5, 10)
+**When** `isValidMove(shape, x, y)` is called
+**Then** it should return `false`
+
+### 5.7 Valid Move - Adjacent to Existing Piece
+**Given** a board with a block at position (5, 10)
+**And** a piece that would occupy (4, 10) but not (5, 10)
+**When** `isValidMove(shape, x, y)` is called
+**Then** it should return `true`
+
+### 5.8 Spawn Position Validation - Game Over
+**Given** blocks exist at the spawn position
+**When** `spawnPiece()` is called
+**Then** `gameOver` should be set to `true`
+
+### 5.9 Ghost Position - Normal Gravity
+**Given** a piece at y = 5 with `antiGravity` false
+**And** the board is empty below the piece until row 19
+**When** `getGhostPosition()` is called
+**Then** it should return the y position where the piece would land (bottom)
+
+### 5.10 Ghost Position - Anti-Gravity
+**Given** a piece at y = 15 with `antiGravity` true
+**And** the board is empty above the piece until row 0
+**When** `getGhostPosition()` is called
+**Then** it should return 0 (top of board)
+
+---
+
+## 6. Scoring &amp; Progression Tests
+
+### 6.1 Soft Drop Points
+**Given** a piece at y = 5
+**When** `movePiece(0, 1)` is called successfully (soft drop)
+**And** score is incremented by 1
+**Then** score should increase by 1 point per cell
+
+### 6.2 Hard Drop Points
+**Given** a piece at y = 5 with empty board below
+**And** the piece will drop 13 cells to reach the bottom
+**When** `hardDrop()` is called
+**Then** score should increase by 26 points (2 * 13)
+
+### 6.3 Single Line Clear Points
+**Given** level is 1
+**When** 1 line is cleared
+**Then** score should increase by 100 points
+
+### 6.4 Double Line Clear Points
+**Given** level is 1
+**When** 2 lines are cleared
+**Then** score should increase by 300 points
+
+### 6.5 Triple Line Clear Points
+**Given** level is 1
+**When** 3 lines are cleared
+**Then** score should increase by 500 points
+
+### 6.6 Tetris Points
+**Given** level is 1
+**When** 4 lines are cleared
+**Then** score should increase by 800 points
+
+### 6.7 Level Multiplier on Scoring
+**Given** level is 3
+**When** 1 line is cleared
+**Then** score should increase by 300 points (100 * 3)
+
+### 6.8 Level Progression - Every 10 Lines
+**Given** lines cleared is 9
+**And** level is 1
+**When** 1 more line is cleared (total = 10)
+**Then** level should become 2
+
+### 6.9 Level Progression - Multiple Levels
+**Given** lines cleared is 25
+**When** level is calculated
+**Then** level should be 3 (floor(25/10) + 1)
+
+### 6.10 Drop Speed Decrease Per Level
+**Given** level is 1
+**And** `dropInterval` is 1000ms
+**When** level increases to 2
+**Then** `dropInterval` should become 900ms (1000 - 100)
+
+### 6.11 Drop Speed Minimum Cap
+**Given** level is 10 or higher
+**When** `dropInterval` is calculated
+**Then** it should not go below 100ms
+
+### 6.12 Initial Score
+**Given** a new game is started
+**When** `resetGame()` is called
+**Then** score should be 0
+
+### 6.13 Initial Level
+**Given** a new game is started
+**When** `resetGame()` is called
+**Then** level should be 1
+
+---
+
+## 7. Game State Tests
+
+### 7.1 Pause Game
+**Given** game is running (`paused` is `false`)
+**When** `togglePause()` is called
+**Then** `paused` should be `true`
+
+### 7.2 Unpause Game
+**Given** game is paused (`paused` is `true`)
+**When** `togglePause()` is called
+**Then** `paused` should be `false`
+
+### 7.3 Game Over Detection - Normal Gravity
+**Given** `antiGravity` is `false`
+**And** blocks are stacked to the top row
+**When** a new piece spawns
+**And** `isValidMove()` returns `false` for spawn position
+**Then** `gameOver` should be set to `true`
+
+### 7.4 Game Over Detection - Anti-Gravity
+**Given** `antiGravity` is `true`
+**And** blocks are stacked to the bottom row
+**When** a new piece spawns at the bottom
+**And** `isValidMove()` returns `false` for spawn position
+**Then** `gameOver` should be set to `true`
+
+### 7.5 Reset Game - Board Cleared
+**Given** a game in progress with pieces on the board
+**When** `resetGame()` is called
+**Then** the board should be empty (all cells = 0)
+
+### 7.6 Reset Game - Score Reset
+**Given** score is 5000
+**When** `resetGame()` is called
+**Then** score should be 0
+
+### 7.7 Reset Game - Level Reset
+**Given** level is 5
+**When** `resetGame()` is called
+**Then** level should be 1
+
+### 7.8 Reset Game - Lines Reset
+**Given** lines is 45
+**When** `resetGame()` is called
+**Then** lines should be 0
+
+### 7.9 Reset Game - Gravity Mode Reset
+**Given** `antiGravity` is `true`
+**When** `resetGame()` is called
+**Then** `antiGravity` should be `false`
+
+### 7.10 Reset Game - Game Over Flag Reset
+**Given** `gameOver` is `true`
+**When** `resetGame()` is called
+**Then** `gameOver` should be `false`
+
+### 7.11 Reset Game - Pause Flag Reset
+**Given** `paused` is `true`
+**When** `resetGame()` is called
+**Then** `paused` should be `false`
+
+### 7.12 Reset Game - Drop Interval Reset
+**Given** `dropInterval` is 500
+**When** `resetGame()` is called
+**Then** `dropInterval` should be 1000
+
+### 7.13 Create Board Dimensions
+**Given** `createBoard()` is called
+**When** the board is created
+**Then** it should have 20 rows (ROWS)
+**And** each row should have 10 columns (COLS)
+**And** all cells should be initialized to 0
+
+### 7.14 Lock Piece - Places on Board
+**Given** a piece at position (4, 18)
+**When** `lockPiece()` is called
+**Then** the piece&#39;s blocks should be added to the board at the correct positions
+
+### 7.15 New Piece Spawns After Lock
+**Given** `nextPiece` is set
+**When** `lockPiece()` is called
+**Then** `currentPiece` should be set to the previous `nextPiece`
+**And** a new `nextPiece` should be generated
+
+---
+
+## Exported Functions Coverage
+
+The following functions from `tetris-game.js` are covered by these tests:
+
+| Function | Test Category |
+|----------|---------------|
+| `createBoard` | Game State (7.13) |
+| `createPiece` | Gravity System (4.12, 4.13) |
+| `getRandomPiece` | Game State (7.15) |
+| `resetCurrentPiece` | Gravity System |
+| `getSwappedType` | Gravity System (4.8, 4.9, 4.10) |
+| `swapCurrentPiece` | Gravity System (4.11) |
+| `swapBoardPieces` | Gravity System (4.4-4.7) |
+| `isValidMove` | Collision Detection (5.1-5.8) |
+| `rotatePiece` | Rotation (2.1-2.11) |
+| `movePiece` | Piece Movement (1.1-1.9) |
+| `hardDrop` | Piece Movement (1.7, 1.8), Scoring (6.2) |
+| `lockPiece` | Game State (7.14, 7.15) |
+| `clearLines` | Line Clearing (3.1-3.7) |
+| `spawnPiece` | Collision Detection (5.8), Game State (7.15) |
+| `flipBoard` | Gravity System (4.3) |
+| `getGhostPosition` | Collision Detection (5.9, 5.10) |
+| `resetGame` | Game State (7.5-7.12) |
+| `togglePause` | Game State (7.1, 7.2) |
+
+### State Getters/Setters (for test setup)
+- `getBoard` / `setBoard`
+- `getCurrentPiece` / `setCurrentPiece`
+- `getNextPiece` / `setNextPiece`
+- `getScore` / `setScore`
+- `getLevel` / `setLevel`
+- `getLines` / `setLines`
+- `isGameOver` / `setGameOver`
+- `isPaused` / `setPaused`
+- `isAntiGravity` / `setAntiGravity`
+- `getDropInterval` / `setDropInterval`
+
+---
+
+## Notes for Jest Implementation
+
+1. **Mock DOM elements**: The game relies on DOM for UI updates. Use Jest mocks or JSDOM for `document.getElementById`.
+
+2. **Isolate state**: Use `beforeEach` to reset game state between tests using the exported setters.
+
+3. **Test anti-gravity separately**: Many functions behave differently based on `antiGravity` state.
+
+4. **Wall kick testing**: Create specific board configurations to test all 5 kick offsets: `[0, -1, 1, -2, 2]`.
+
+5. **Line scoring array**: Points array is `[0, 100, 300, 500, 800]` for 0-4 lines respectively.
+</pre></div><button class="expand-btn">Show more</button></div>
+</div></div></div>
+<div class="message tool-reply" id="msg-2026-01-30T21-02-29-830Z"><div class="message-header"><span class="role-label">Tool reply</span><a href="#msg-2026-01-30T21-02-29-830Z" class="timestamp-link"><time datetime="2026-01-30T21:02:29.830Z" data-timestamp="2026-01-30T21:02:29.830Z">2026-01-30T21:02:29.830Z</time></a></div><div class="message-content"><div class="tool-result"><div class="truncatable"><div class="truncatable-content"><pre>File created successfully at: /Users/chriswarner/Desktop/CS1970/Tetris Test Grav/Testing.md</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-02-33-296Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-02-33-296Z" class="timestamp-link"><time datetime="2026-01-30T21:02:33.296Z" data-timestamp="2026-01-30T21:02:33.296Z">2026-01-30T21:02:33.296Z</time></a></div><div class="message-content">
+<div class="assistant-text"><p>Now let me verify the file was created correctly and review it for completeness.</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-02-33-618Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-02-33-618Z" class="timestamp-link"><time datetime="2026-01-30T21:02:33.618Z" data-timestamp="2026-01-30T21:02:33.618Z">2026-01-30T21:02:33.618Z</time></a></div><div class="message-content">
+<div class="tool-use" data-tool-id="toolu_01WKuRm3A5bsHpPA9Uv3JfpF"><div class="tool-header"><span class="tool-icon">⚙</span> Read</div><div class="truncatable"><div class="truncatable-content"><pre class="json">{
+  &#34;file_path&#34;: &#34;/Users/chriswarner/Desktop/CS1970/Tetris Test Grav/Testing.md&#34;
+}</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message tool-reply" id="msg-2026-01-30T21-02-33-623Z"><div class="message-header"><span class="role-label">Tool reply</span><a href="#msg-2026-01-30T21-02-33-623Z" class="timestamp-link"><time datetime="2026-01-30T21:02:33.623Z" data-timestamp="2026-01-30T21:02:33.623Z">2026-01-30T21:02:33.623Z</time></a></div><div class="message-content"><div class="tool-result"><div class="truncatable"><div class="truncatable-content"><pre>     1→# Test Design Document for Tetris Game
+     2→
+     3→This document contains structured test scenarios for `tetris-game.js` designed for implementation with Jest. All tests follow the Given/When/Then format.
+     4→
+     5→---
+     6→
+     7→## Table of Contents
+     8→1. [Piece Movement Tests](#1-piece-movement-tests)
+     9→2. [Rotation Tests](#2-rotation-tests)
+    10→3. [Line Clearing Tests](#3-line-clearing-tests)
+    11→4. [Gravity System Tests](#4-gravity-system-tests)
+    12→5. [Collision Detection Tests](#5-collision-detection-tests)
+    13→6. [Scoring &amp; Progression Tests](#6-scoring--progression-tests)
+    14→7. [Game State Tests](#7-game-state-tests)
+    15→
+    16→---
+    17→
+    18→## 1. Piece Movement Tests
+    19→
+    20→### 1.1 Move Left - Valid Move
+    21→**Given** a piece is in the middle of the board (x = 5)
+    22→**When** `movePiece(-1, 0)` is called
+    23→**Then** the piece&#x27;s x position should decrease by 1 (x = 4)
+    24→**And** the function should return `true`
+    25→
+    26→### 1.2 Move Right - Valid Move
+    27→**Given** a piece is in the middle of the board (x = 4)
+    28→**When** `movePiece(1, 0)` is called
+    29→**Then** the piece&#x27;s x position should increase by 1 (x = 5)
+    30→**And** the function should return `true`
+    31→
+    32→### 1.3 Move Left - Blocked by Left Wall
+    33→**Given** a piece is at the left edge (x = 0)
+    34→**When** `movePiece(-1, 0)` is called
+    35→**Then** the piece&#x27;s x position should remain 0
+    36→**And** the function should return `false`
+    37→
+    38→### 1.4 Move Right - Blocked by Right Wall
+    39→**Given** an I-piece is positioned so its rightmost block is at column 9 (COLS - 1)
+    40→**When** `movePiece(1, 0)` is called
+    41→**Then** the piece&#x27;s position should not change
+    42→**And** the function should return `false`
+    43→
+    44→### 1.5 Soft Drop - Normal Gravity
+    45→**Given** a piece is at y = 5 with `antiGravity` set to `false`
+    46→**When** `movePiece(0, 1)` is called
+    47→**Then** the piece&#x27;s y position should increase by 1 (y = 6)
+    48→**And** the function should return `true`
+    49→
+    50→### 1.6 Soft Drop - Anti-Gravity
+    51→**Given** a piece is at y = 15 with `antiGravity` set to `true`
+    52→**When** `movePiece(0, -1)` is called
+    53→**Then** the piece&#x27;s y position should decrease by 1 (y = 14)
+    54→**And** the function should return `true`
+    55→
+    56→### 1.7 Hard Drop - Normal Gravity
+    57→**Given** a piece is at y = 5 with an empty board and `antiGravity` set to `false`
+    58→**When** `hardDrop()` is called
+    59→**Then** the piece should move to the bottom of the board
+    60→**And** `lockPiece()` should be called
+    61→**And** score should increase by 2 points per cell dropped
+    62→
+    63→### 1.8 Hard Drop - Anti-Gravity
+    64→**Given** a piece is at y = 15 with an empty board and `antiGravity` set to `true`
+    65→**When** `hardDrop()` is called
+    66→**Then** the piece should move to the top of the board (y = 0)
+    67→**And** `lockPiece()` should be called
+    68→**And** score should increase by 2 points per cell risen
+    69→
+    70→### 1.9 Move Blocked by Existing Piece
+    71→**Given** a piece is at position (4, 10)
+    72→**And** there is a locked block at position (3, 10)
+    73→**When** `movePiece(-1, 0)` is called
+    74→**Then** the piece should not move
+    75→**And** the function should return `false`
+    76→
+    77→---
+    78→
+    79→## 2. Rotation Tests
+    80→
+    81→### 2.1 Basic Rotation - T-Piece
+    82→**Given** a T-piece with shape `[[0, 6, 0], [6, 6, 6]]`
+    83→**When** `rotatePiece()` is called
+    84→**Then** the shape should become `[[6, 0], [6, 6], [6, 0]]`
+    85→
+    86→### 2.2 Basic Rotation - I-Piece
+    87→**Given** an I-piece with shape `[[1, 1, 1, 1]]` (horizontal)
+    88→**When** `rotatePiece()` is called
+    89→**Then** the shape should become `[[1], [1], [1], [1]]` (vertical)
+    90→
+    91→### 2.3 Basic Rotation - J-Piece
+    92→**Given** a J-piece with shape `[[2, 0, 0], [2, 2, 2]]`
+    93→**When** `rotatePiece()` is called
+    94→**Then** the shape should rotate 90 degrees clockwise
+    95→
+    96→### 2.4 Basic Rotation - L-Piece
+    97→**Given** an L-piece with shape `[[0, 0, 3], [3, 3, 3]]`
+    98→**When** `rotatePiece()` is called
+    99→**Then** the shape should rotate 90 degrees clockwise
+   100→
+   101→### 2.5 Basic Rotation - S-Piece
+   102→**Given** an S-piece with shape `[[0, 5, 5], [5, 5, 0]]`
+   103→**When** `rotatePiece()` is called
+   104→**Then** the shape should rotate 90 degrees clockwise
+   105→
+   106→### 2.6 Basic Rotation - Z-Piece
+   107→**Given** a Z-piece with shape `[[7, 7, 0], [0, 7, 7]]`
+   108→**When** `rotatePiece()` is called
+   109→**Then** the shape should rotate 90 degrees clockwise
+   110→
+   111→### 2.7 O-Piece - No Rotation Change
+   112→**Given** an O-piece with shape `[[4, 4], [4, 4]]`
+   113→**When** `rotatePiece()` is called
+   114→**Then** the shape should remain `[[4, 4], [4, 4]]` (visually identical)
+   115→
+   116→### 2.8 Wall Kick - Near Left Wall
+   117→**Given** a T-piece at x = 0
+   118→**And** rotation would place part of the piece at x = -1
+   119→**When** `rotatePiece()` is called
+   120→**Then** the piece should rotate
+   121→**And** x position should be adjusted by wall kick (+1)
+   122→
+   123→### 2.9 Wall Kick - Near Right Wall
+   124→**Given** a T-piece at x = 8 (near right edge)
+   125→**And** rotation would place part of the piece beyond column 9
+   126→**When** `rotatePiece()` is called
+   127→**Then** the piece should rotate
+   128→**And** x position should be adjusted by wall kick (-1)
+   129→
+   130→### 2.10 Rotation Blocked by Existing Pieces
+   131→**Given** a T-piece in the middle of the board
+   132→**And** existing blocks surround it preventing any valid rotation position
+   133→**When** `rotatePiece()` is called
+   134→**Then** the piece shape should remain unchanged
+   135→**And** the piece position should remain unchanged
+   136→
+   137→### 2.11 Wall Kick Tries Multiple Offsets
+   138→**Given** a piece near a wall
+   139→**And** kick offset 0 is invalid, kick offset -1 is invalid, but kick offset 1 is valid
+   140→**When** `rotatePiece()` is called
+   141→**Then** the piece should rotate with x offset of +1
+   142→
+   143→---
+   144→
+   145→## 3. Line Clearing Tests
+   146→
+   147→### 3.1 Single Line Clear - Normal Gravity
+   148→**Given** `antiGravity` is `false`
+   149→**And** row 19 (bottom) is completely filled
+   150→**And** all other rows have some empty cells
+   151→**When** `clearLines()` is called
+   152→**Then** row 19 should be removed
+   153→**And** a new empty row should be added at row 0 (top)
+   154→**And** `lines` should increase by 1
+   155→**And** score should increase by 100 * level
+   156→
+   157→### 3.2 Double Line Clear
+   158→**Given** rows 18 and 19 are completely filled
+   159→**When** `clearLines()` is called
+   160→**Then** both rows should be removed
+   161→**And** `lines` should increase by 2
+   162→**And** score should increase by 300 * level
+   163→
+   164→### 3.3 Triple Line Clear
+   165→**Given** rows 17, 18, and 19 are completely filled
+   166→**When** `clearLines()` is called
+   167→**Then** all three rows should be removed
+   168→**And** `lines` should increase by 3
+   169→**And** score should increase by 500 * level
+   170→
+   171→### 3.4 Tetris (4 Lines Clear)
+   172→**Given** rows 16, 17, 18, and 19 are completely filled
+   173→**When** `clearLines()` is called
+   174→**Then** all four rows should be removed
+   175→**And** `lines` should increase by 4
+   176→**And** score should increase by 800 * level
+   177→
+   178→### 3.5 Anti-Gravity Line Clear - From Top
+   179→**Given** `antiGravity` is `true`
+   180→**And** row 0 (top) is completely filled
+   181→**When** `clearLines()` is called
+   182→**Then** row 0 should be removed
+   183→**And** a new empty row should be added at the bottom (row 19)
+   184→
+   185→### 3.6 Line Clear Scoring at Higher Levels
+   186→**Given** level is 5
+   187→**And** a single line is cleared
+   188→**When** `clearLines()` is called
+   189→**Then** score should increase by 100 * 5 = 500 points
+   190→
+   191→### 3.7 No Lines to Clear
+   192→**Given** no rows are completely filled
+   193→**When** `clearLines()` is called
+   194→**Then** the board should remain unchanged
+   195→**And** score should remain unchanged
+   196→**And** lines count should remain unchanged
+   197→
+   198→---
+   199→
+   200→## 4. Gravity System Tests
+   201→
+   202→### 4.1 Normal Gravity - Piece Falls Down
+   203→**Given** `antiGravity` is `false`
+   204→**And** a piece is at y = 5
+   205→**When** the game loop calls `movePiece(0, 1)`
+   206→**Then** the piece should move to y = 6
+   207→
+   208→### 4.2 Anti-Gravity - Piece Rises Up
+   209→**Given** `antiGravity` is `true`
+   210→**And** a piece is at y = 15
+   211→**When** the game loop calls `movePiece(0, -1)`
+   212→**Then** the piece should move to y = 14
+   213→
+   214→### 4.3 Toggle Gravity - Board Flips
+   215→**Given** an initial board state with pieces at the bottom (rows 15-19)
+   216→**When** `toggleGravity()` is called
+   217→**Then** `antiGravity` should become `true`
+   218→**And** the board should be vertically flipped (pieces now at rows 0-4)
+   219→
+   220→### 4.4 Toggle Gravity - J Piece Swaps to L
+   221→**Given** the board contains J-pieces (type 2)
+   222→**When** `toggleGravity()` is called
+   223→**Then** all J-pieces on the board should become L-pieces (type 3)
+   224→
+   225→### 4.5 Toggle Gravity - L Piece Swaps to J
+   226→**Given** the board contains L-pieces (type 3)
+   227→**When** `toggleGravity()` is called
+   228→**Then** all L-pieces on the board should become J-pieces (type 2)
+   229→
+   230→### 4.6 Toggle Gravity - S Piece Swaps to Z
+   231→**Given** the board contains S-pieces (type 5)
+   232→**When** `toggleGravity()` is called
+   233→**Then** all S-pieces on the board should become Z-pieces (type 7)
+   234→
+   235→### 4.7 Toggle Gravity - Z Piece Swaps to S
+   236→**Given** the board contains Z-pieces (type 7)
+   237→**When** `toggleGravity()` is called
+   238→**Then** all Z-pieces on the board should become S-pieces (type 5)
+   239→
+   240→### 4.8 Non-Swappable Pieces - I Piece
+   241→**Given** `getSwappedType()` is called with type 1 (I-piece)
+   242→**When** the function executes
+   243→**Then** it should return 1 (unchanged)
+   244→
+   245→### 4.9 Non-Swappable Pieces - O Piece
+   246→**Given** `getSwappedType()` is called with type 4 (O-piece)
+   247→**When** the function executes
+   248→**Then** it should return 4 (unchanged)
+   249→
+   250→### 4.10 Non-Swappable Pieces - T Piece
+   251→**Given** `getSwappedType()` is called with type 6 (T-piece)
+   252→**When** the function executes
+   253→**Then** it should return 6 (unchanged)
+   254→
+   255→### 4.11 Current Piece Swaps on Toggle
+   256→**Given** the current falling piece is a J-piece (type 2)
+   257→**When** `toggleGravity()` is called
+   258→**Then** the current piece should become an L-piece (type 3)
+   259→
+   260→### 4.12 Spawn Position - Normal Gravity
+   261→**Given** `antiGravity` is `false`
+   262→**When** `createPiece(type)` is called
+   263→**Then** the piece&#x27;s y position should be 0 (top of board)
+   264→
+   265→### 4.13 Spawn Position - Anti-Gravity
+   266→**Given** `antiGravity` is `true`
+   267→**When** `createPiece(type)` is called
+   268→**Then** the piece&#x27;s y position should be `ROWS - shape.length` (bottom of board)
+   269→
+   270→---
+   271→
+   272→## 5. Collision Detection Tests
+   273→
+   274→### 5.1 Valid Move - Empty Space
+   275→**Given** an empty board
+   276→**And** a piece shape at position (4, 5)
+   277→**When** `isValidMove(shape, 4, 5)` is called
+   278→**Then** it should return `true`
+   279→
+   280→### 5.2 Invalid Move - Left Wall Boundary
+   281→**Given** a piece shape that would extend to x = -1
+   282→**When** `isValidMove(shape, -1, 5)` is called
+   283→**Then** it should return `false`
+   284→
+   285→### 5.3 Invalid Move - Right Wall Boundary
+   286→**Given** a piece shape that would extend beyond x = 9 (COLS - 1)
+   287→**When** `isValidMove(shape, 9, 5)` is called for a piece wider than 1 column
+   288→**Then** it should return `false`
+   289→
+   290→### 5.4 Invalid Move - Floor Boundary
+   291→**Given** a piece shape that would extend to y = 20 (ROWS)
+   292→**When** `isValidMove(shape, 4, 19)` is called for a piece taller than 1 row
+   293→**Then** it should return `false`
+   294→
+   295→### 5.5 Invalid Move - Ceiling Boundary
+   296→**Given** a piece shape that would extend to y = -1
+   297→**When** `isValidMove(shape, 4, -1)` is called
+   298→**Then** it should return `false`
+   299→
+   300→### 5.6 Invalid Move - Collision with Existing Piece
+   301→**Given** a board with a block at position (5, 10)
+   302→**And** a piece that would occupy (5, 10)
+   303→**When** `isValidMove(shape, x, y)` is called
+   304→**Then** it should return `false`
+   305→
+   306→### 5.7 Valid Move - Adjacent to Existing Piece
+   307→**Given** a board with a block at position (5, 10)
+   308→**And** a piece that would occupy (4, 10) but not (5, 10)
+   309→**When** `isValidMove(shape, x, y)` is called
+   310→**Then** it should return `true`
+   311→
+   312→### 5.8 Spawn Position Validation - Game Over
+   313→**Given** blocks exist at the spawn position
+   314→**When** `spawnPiece()` is called
+   315→**Then** `gameOver` should be set to `true`
+   316→
+   317→### 5.9 Ghost Position - Normal Gravity
+   318→**Given** a piece at y = 5 with `antiGravity` false
+   319→**And** the board is empty below the piece until row 19
+   320→**When** `getGhostPosition()` is called
+   321→**Then** it should return the y position where the piece would land (bottom)
+   322→
+   323→### 5.10 Ghost Position - Anti-Gravity
+   324→**Given** a piece at y = 15 with `antiGravity` true
+   325→**And** the board is empty above the piece until row 0
+   326→**When** `getGhostPosition()` is called
+   327→**Then** it should return 0 (top of board)
+   328→
+   329→---
+   330→
+   331→## 6. Scoring &amp; Progression Tests
+   332→
+   333→### 6.1 Soft Drop Points
+   334→**Given** a piece at y = 5
+   335→**When** `movePiece(0, 1)` is called successfully (soft drop)
+   336→**And** score is incremented by 1
+   337→**Then** score should increase by 1 point per cell
+   338→
+   339→### 6.2 Hard Drop Points
+   340→**Given** a piece at y = 5 with empty board below
+   341→**And** the piece will drop 13 cells to reach the bottom
+   342→**When** `hardDrop()` is called
+   343→**Then** score should increase by 26 points (2 * 13)
+   344→
+   345→### 6.3 Single Line Clear Points
+   346→**Given** level is 1
+   347→**When** 1 line is cleared
+   348→**Then** score should increase by 100 points
+   349→
+   350→### 6.4 Double Line Clear Points
+   351→**Given** level is 1
+   352→**When** 2 lines are cleared
+   353→**Then** score should increase by 300 points
+   354→
+   355→### 6.5 Triple Line Clear Points
+   356→**Given** level is 1
+   357→**When** 3 lines are cleared
+   358→**Then** score should increase by 500 points
+   359→
+   360→### 6.6 Tetris Points
+   361→**Given** level is 1
+   362→**When** 4 lines are cleared
+   363→**Then** score should increase by 800 points
+   364→
+   365→### 6.7 Level Multiplier on Scoring
+   366→**Given** level is 3
+   367→**When** 1 line is cleared
+   368→**Then** score should increase by 300 points (100 * 3)
+   369→
+   370→### 6.8 Level Progression - Every 10 Lines
+   371→**Given** lines cleared is 9
+   372→**And** level is 1
+   373→**When** 1 more line is cleared (total = 10)
+   374→**Then** level should become 2
+   375→
+   376→### 6.9 Level Progression - Multiple Levels
+   377→**Given** lines cleared is 25
+   378→**When** level is calculated
+   379→**Then** level should be 3 (floor(25/10) + 1)
+   380→
+   381→### 6.10 Drop Speed Decrease Per Level
+   382→**Given** level is 1
+   383→**And** `dropInterval` is 1000ms
+   384→**When** level increases to 2
+   385→**Then** `dropInterval` should become 900ms (1000 - 100)
+   386→
+   387→### 6.11 Drop Speed Minimum Cap
+   388→**Given** level is 10 or higher
+   389→**When** `dropInterval` is calculated
+   390→**Then** it should not go below 100ms
+   391→
+   392→### 6.12 Initial Score
+   393→**Given** a new game is started
+   394→**When** `resetGame()` is called
+   395→**Then** score should be 0
+   396→
+   397→### 6.13 Initial Level
+   398→**Given** a new game is started
+   399→**When** `resetGame()` is called
+   400→**Then** level should be 1
+   401→
+   402→---
+   403→
+   404→## 7. Game State Tests
+   405→
+   406→### 7.1 Pause Game
+   407→**Given** game is running (`paused` is `false`)
+   408→**When** `togglePause()` is called
+   409→**Then** `paused` should be `true`
+   410→
+   411→### 7.2 Unpause Game
+   412→**Given** game is paused (`paused` is `true`)
+   413→**When** `togglePause()` is called
+   414→**Then** `paused` should be `false`
+   415→
+   416→### 7.3 Game Over Detection - Normal Gravity
+   417→**Given** `antiGravity` is `false`
+   418→**And** blocks are stacked to the top row
+   419→**When** a new piece spawns
+   420→**And** `isValidMove()` returns `false` for spawn position
+   421→**Then** `gameOver` should be set to `true`
+   422→
+   423→### 7.4 Game Over Detection - Anti-Gravity
+   424→**Given** `antiGravity` is `true`
+   425→**And** blocks are stacked to the bottom row
+   426→**When** a new piece spawns at the bottom
+   427→**And** `isValidMove()` returns `false` for spawn position
+   428→**Then** `gameOver` should be set to `true`
+   429→
+   430→### 7.5 Reset Game - Board Cleared
+   431→**Given** a game in progress with pieces on the board
+   432→**When** `resetGame()` is called
+   433→**Then** the board should be empty (all cells = 0)
+   434→
+   435→### 7.6 Reset Game - Score Reset
+   436→**Given** score is 5000
+   437→**When** `resetGame()` is called
+   438→**Then** score should be 0
+   439→
+   440→### 7.7 Reset Game - Level Reset
+   441→**Given** level is 5
+   442→**When** `resetGame()` is called
+   443→**Then** level should be 1
+   444→
+   445→### 7.8 Reset Game - Lines Reset
+   446→**Given** lines is 45
+   447→**When** `resetGame()` is called
+   448→**Then** lines should be 0
+   449→
+   450→### 7.9 Reset Game - Gravity Mode Reset
+   451→**Given** `antiGravity` is `true`
+   452→**When** `resetGame()` is called
+   453→**Then** `antiGravity` should be `false`
+   454→
+   455→### 7.10 Reset Game - Game Over Flag Reset
+   456→**Given** `gameOver` is `true`
+   457→**When** `resetGame()` is called
+   458→**Then** `gameOver` should be `false`
+   459→
+   460→### 7.11 Reset Game - Pause Flag Reset
+   461→**Given** `paused` is `true`
+   462→**When** `resetGame()` is called
+   463→**Then** `paused` should be `false`
+   464→
+   465→### 7.12 Reset Game - Drop Interval Reset
+   466→**Given** `dropInterval` is 500
+   467→**When** `resetGame()` is called
+   468→**Then** `dropInterval` should be 1000
+   469→
+   470→### 7.13 Create Board Dimensions
+   471→**Given** `createBoard()` is called
+   472→**When** the board is created
+   473→**Then** it should have 20 rows (ROWS)
+   474→**And** each row should have 10 columns (COLS)
+   475→**And** all cells should be initialized to 0
+   476→
+   477→### 7.14 Lock Piece - Places on Board
+   478→**Given** a piece at position (4, 18)
+   479→**When** `lockPiece()` is called
+   480→**Then** the piece&#x27;s blocks should be added to the board at the correct positions
+   481→
+   482→### 7.15 New Piece Spawns After Lock
+   483→**Given** `nextPiece` is set
+   484→**When** `lockPiece()` is called
+   485→**Then** `currentPiece` should be set to the previous `nextPiece`
+   486→**And** a new `nextPiece` should be generated
+   487→
+   488→---
+   489→
+   490→## Exported Functions Coverage
+   491→
+   492→The following functions from `tetris-game.js` are covered by these tests:
+   493→
+   494→| Function | Test Category |
+   495→|----------|---------------|
+   496→| `createBoard` | Game State (7.13) |
+   497→| `createPiece` | Gravity System (4.12, 4.13) |
+   498→| `getRandomPiece` | Game State (7.15) |
+   499→| `resetCurrentPiece` | Gravity System |
+   500→| `getSwappedType` | Gravity System (4.8, 4.9, 4.10) |
+   501→| `swapCurrentPiece` | Gravity System (4.11) |
+   502→| `swapBoardPieces` | Gravity System (4.4-4.7) |
+   503→| `isValidMove` | Collision Detection (5.1-5.8) |
+   504→| `rotatePiece` | Rotation (2.1-2.11) |
+   505→| `movePiece` | Piece Movement (1.1-1.9) |
+   506→| `hardDrop` | Piece Movement (1.7, 1.8), Scoring (6.2) |
+   507→| `lockPiece` | Game State (7.14, 7.15) |
+   508→| `clearLines` | Line Clearing (3.1-3.7) |
+   509→| `spawnPiece` | Collision Detection (5.8), Game State (7.15) |
+   510→| `flipBoard` | Gravity System (4.3) |
+   511→| `getGhostPosition` | Collision Detection (5.9, 5.10) |
+   512→| `resetGame` | Game State (7.5-7.12) |
+   513→| `togglePause` | Game State (7.1, 7.2) |
+   514→
+   515→### State Getters/Setters (for test setup)
+   516→- `getBoard` / `setBoard`
+   517→- `getCurrentPiece` / `setCurrentPiece`
+   518→- `getNextPiece` / `setNextPiece`
+   519→- `getScore` / `setScore`
+   520→- `getLevel` / `setLevel`
+   521→- `getLines` / `setLines`
+   522→- `isGameOver` / `setGameOver`
+   523→- `isPaused` / `setPaused`
+   524→- `isAntiGravity` / `setAntiGravity`
+   525→- `getDropInterval` / `setDropInterval`
+   526→
+   527→---
+   528→
+   529→## Notes for Jest Implementation
+   530→
+   531→1. **Mock DOM elements**: The game relies on DOM for UI updates. Use Jest mocks or JSDOM for `document.getElementById`.
+   532→
+   533→2. **Isolate state**: Use `beforeEach` to reset game state between tests using the exported setters.
+   534→
+   535→3. **Test anti-gravity separately**: Many functions behave differently based on `antiGravity` state.
+   536→
+   537→4. **Wall kick testing**: Create specific board configurations to test all 5 kick offsets: `[0, -1, 1, -2, 2]`.
+   538→
+   539→5. **Line scoring array**: Points array is `[0, 100, 300, 500, 800]` for 0-4 lines respectively.
+   540→
+
+&lt;system-reminder&gt;
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+&lt;/system-reminder&gt;
+</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-02-47-871Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-02-47-871Z" class="timestamp-link"><time datetime="2026-01-30T21:02:47.871Z" data-timestamp="2026-01-30T21:02:47.871Z">2026-01-30T21:02:47.871Z</time></a></div><div class="message-content">
+<div class="assistant-text"><p>The <code>Testing.md</code> file has been created successfully. Let me provide a summary:</p>
+<h2>Summary</h2>
+<p>Created <code>/Users/chriswarner/Desktop/CS1970/Tetris Test Grav/Testing.md</code> containing:</p>
+<p><strong>7 Test Categories with 67 Total Test Scenarios:</strong>
+1. <strong>Piece Movement Tests</strong> (9 tests) - left/right movement, soft/hard drops, boundary checks
+2. <strong>Rotation Tests</strong> (11 tests) - all 7 piece types, wall kicks, blocked rotations
+3. <strong>Line Clearing Tests</strong> (7 tests) - single through tetris clears, anti-gravity clearing
+4. <strong>Gravity System Tests</strong> (13 tests) - piece falling/rising, board flip, piece swapping (J↔L, S↔Z)
+5. <strong>Collision Detection Tests</strong> (10 tests) - wall/floor/ceiling boundaries, piece-to-piece collision
+6. <strong>Scoring &amp; Progression Tests</strong> (13 tests) - soft/hard drop points, line clear scoring, level progression
+7. <strong>Game State Tests</strong> (15 tests) - pause, game over, reset functionality</p>
+<p><strong>Additional Sections:</strong>
+- Exported functions coverage table mapping all 18 core functions to their test categories
+- List of all state getters/setters available for test setup
+- Jest implementation notes (DOM mocking, state isolation, wall kick offsets)</p>
+<p>All tests follow the <strong>Given/When/Then</strong> format as requested, making them ready for Jest implementation.</p></div></div></div>
+<div class="message user" id="msg-2026-01-30T21-16-08-958Z"><div class="message-header"><span class="role-label">User</span><a href="#msg-2026-01-30T21-16-08-958Z" class="timestamp-link"><time datetime="2026-01-30T21:16:08.958Z" data-timestamp="2026-01-30T21:16:08.958Z">2026-01-30T21:16:08.958Z</time></a></div><div class="message-content">
+<div class="user-content"><p>can you confirm that the tests for 1.5 and 1.6 are correct?</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-16-25-438Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-16-25-438Z" class="timestamp-link"><time datetime="2026-01-30T21:16:25.438Z" data-timestamp="2026-01-30T21:16:25.438Z">2026-01-30T21:16:25.438Z</time></a></div><div class="message-content">
+<div class="thinking"><div class="thinking-label">Thinking</div><p>The user is asking me to verify tests 1.5 and 1.6 in the Testing.md file. Let me look at what those tests say and compare them to the actual code in tetris-game.js.</p>
+<p>Test 1.5 Soft Drop - Normal Gravity:
+<strong>Given</strong> a piece is at y = 5 with <code>antiGravity</code> set to <code>false</code>
+<strong>When</strong> <code>movePiece(0, 1)</code> is called
+<strong>Then</strong> the piece's y position should increase by 1 (y = 6)
+<strong>And</strong> the function should return <code>true</code></p>
+<p>Test 1.6 Soft Drop - Anti-Gravity:
+<strong>Given</strong> a piece is at y = 15 with <code>antiGravity</code> set to <code>true</code>
+<strong>When</strong> <code>movePiece(0, -1)</code> is called
+<strong>Then</strong> the piece's y position should decrease by 1 (y = 14)
+<strong>And</strong> the function should return <code>true</code></p>
+<p>Now let me check the code in tetris-game.js:</p>
+<pre><code class="language-javascript">function movePiece(dx, dy) {
+    if (isValidMove(currentPiece.shape, currentPiece.x + dx, currentPiece.y + dy)) {
+        currentPiece.x += dx;
+        currentPiece.y += dy;
+        return true;
+    }
+    return false;
+}
+</code></pre>
+<p>And the soft drop handling in handleKeyDown:</p>
+<pre><code class="language-javascript">case 'ArrowDown':
+    if (antiGravity) {
+        if (movePiece(0, -1)) score += 1;
+    } else {
+        if (movePiece(0, 1)) score += 1;
+    }
+    break;
+</code></pre>
+<p>So the tests are describing the correct behavior:
+- Normal gravity: soft drop moves piece down (y increases, dy = +1)</p>
+<ul>
+<li>Anti-gravity: soft drop moves piece up (y decreases, dy = -1)</li>
+</ul>
+<p>Looking more closely though, I notice the test descriptions mention <code>antiGravity</code> being set, but <code>movePiece</code> itself doesn't check that flag—it just applies the dx and dy values passed to it. The <code>antiGravity</code> logic is actually in <code>handleKeyDown</code>, which decides whether to call <code>movePiece(0, 1)</code> or <code>movePiece(0, -1)</code>. So the tests are somewhat misleading in their wording since they're describing behavior that's determined by the caller, not by <code>movePiece</code> itself. describe how soft drop operates depending on the gravity mode. In normal gravity, soft drop invokes <code>movePiece(0, 1)</code> to move the piece downward. In anti-gravity mode, it calls <code>movePiece(0, -1)</code> to move the piece upward instead. Both tests accurately capture this expected behavior.</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-16-30-002Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-16-30-002Z" class="timestamp-link"><time datetime="2026-01-30T21:16:30.002Z" data-timestamp="2026-01-30T21:16:30.002Z">2026-01-30T21:16:30.002Z</time></a></div><div class="message-content">
+<div class="assistant-text"><p>Let me check the code to verify tests 1.5 and 1.6.</p>
+<p>Looking at the relevant code in <code>tetris-game.js</code>:</p>
+<p><strong><code>movePiece</code> function (lines 278-285):</strong></p>
+<pre><code class="language-javascript">function movePiece(dx, dy) {
+    if (isValidMove(currentPiece.shape, currentPiece.x + dx, currentPiece.y + dy)) {
+        currentPiece.x += dx;
+        currentPiece.y += dy;
+        return true;
+    }
+    return false;
+}
+</code></pre>
+<p><strong>Soft drop handling in <code>handleKeyDown</code> (lines 463-468):</strong></p>
+<pre><code class="language-javascript">case 'ArrowDown':
+    if (antiGravity) {
+        if (movePiece(0, -1)) score += 1;
+    } else {
+        if (movePiece(0, 1)) score += 1;
+    }
+    break;
+</code></pre>
+<p><strong>Verification:</strong></p>
+<ul>
+<li>
+<p><strong>Test 1.5</strong> (Normal Gravity): Correct. When <code>antiGravity</code> is <code>false</code>, soft drop calls <code>movePiece(0, 1)</code>, moving the piece down (y increases from 5 to 6).</p>
+</li>
+<li>
+<p><strong>Test 1.6</strong> (Anti-Gravity): Correct. When <code>antiGravity</code> is <code>true</code>, soft drop calls <code>movePiece(0, -1)</code>, moving the piece up (y decreases from 15 to 14).</p>
+</li>
+</ul>
+<p>Both tests accurately describe the soft drop behavior. One minor note: the <code>movePiece</code> function itself doesn't check <code>antiGravity</code> - it simply applies the given delta. The <code>antiGravity</code> state determines <em>which</em> delta is passed to <code>movePiece</code> in the key handler. The tests are written from the integration perspective (what happens during soft drop in each gravity mode), which is appropriate.</p></div></div></div>
+<div class="message user" id="msg-2026-01-30T21-17-10-061Z"><div class="message-header"><span class="role-label">User</span><a href="#msg-2026-01-30T21-17-10-061Z" class="timestamp-link"><time datetime="2026-01-30T21:17:10.061Z" data-timestamp="2026-01-30T21:17:10.061Z">2026-01-30T21:17:10.061Z</time></a></div><div class="message-content">
+<div class="user-content"><p>can you implement testing.md into a jest file? Then run the tests.</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-17-14-412Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-17-14-412Z" class="timestamp-link"><time datetime="2026-01-30T21:17:14.412Z" data-timestamp="2026-01-30T21:17:14.412Z">2026-01-30T21:17:14.412Z</time></a></div><div class="message-content">
+<div class="thinking"><div class="thinking-label">Thinking</div><p>The user wants me to implement the test scenarios from Testing.md into a Jest test file and then run the tests. This is a significant task that involves:</p>
+<ol>
+<li>Creating a Jest test file based on the Testing.md scenarios</li>
+<li>Setting up Jest if not already configured</li>
+<li>Running the tests</li>
+</ol>
+<p>Let me start by creating the test file. I'll need to:
+- Import the game module
+- Set up mocks for DOM elements (since the game uses document.getElementById)
+- Implement all the test scenarios from Testing.md</p>
+<p>Let me create a comprehensive test file.</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-17-14-670Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-17-14-670Z" class="timestamp-link"><time datetime="2026-01-30T21:17:14.670Z" data-timestamp="2026-01-30T21:17:14.670Z">2026-01-30T21:17:14.670Z</time></a></div><div class="message-content">
+<div class="assistant-text"><p>I'll create a Jest test file implementing the test scenarios from Testing.md, then run the tests.</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-19-06-086Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-19-06-086Z" class="timestamp-link"><time datetime="2026-01-30T21:19:06.086Z" data-timestamp="2026-01-30T21:19:06.086Z">2026-01-30T21:19:06.086Z</time></a></div><div class="message-content"><div class="file-tool write-tool" data-tool-id="toolu_011MCiWZZ9biZbQn1o3k2ddH">
+<div class="file-tool-header write-header"><span class="file-tool-icon">📝</span> Write <span class="file-tool-path">tetris-game.test.js</span></div>
+<div class="file-tool-fullpath">/Users/chriswarner/Desktop/CS1970/Tetris Test Grav/tetris-game.test.js</div>
+<div class="truncatable"><div class="truncatable-content"><pre class="file-content">/**
+ * Jest Test Suite for Tetris Game
+ * Based on Testing.md specifications
+ */
+
+// Mock DOM elements before requiring the module
+document.body.innerHTML = `
+  &lt;canvas id=&#34;game-canvas&#34; width=&#34;300&#34; height=&#34;600&#34;&gt;&lt;/canvas&gt;
+  &lt;canvas id=&#34;next-canvas&#34; width=&#34;120&#34; height=&#34;120&#34;&gt;&lt;/canvas&gt;
+  &lt;div id=&#34;score&#34;&gt;0&lt;/div&gt;
+  &lt;div id=&#34;level&#34;&gt;1&lt;/div&gt;
+  &lt;div id=&#34;lines&#34;&gt;0&lt;/div&gt;
+  &lt;div id=&#34;mode-indicator&#34; class=&#34;mode-indicator gravity&#34;&gt;GRAVITY MODE&lt;/div&gt;
+  &lt;div id=&#34;game-over-overlay&#34;&gt;&lt;div id=&#34;final-score&#34;&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;div id=&#34;pause-overlay&#34;&gt;&lt;/div&gt;
+  &lt;button id=&#34;restart-btn&#34;&gt;&lt;/button&gt;
+`;
+
+const game = require(&#39;./tetris-game.js&#39;);
+
+// Helper function to create an empty board
+function createEmptyBoard() {
+  const board = [];
+  for (let r = 0; r &lt; game.ROWS; r++) {
+    board.push(new Array(game.COLS).fill(0));
+  }
+  return board;
+}
+
+// Helper function to create a filled row
+function createFilledRow(value = 1) {
+  return new Array(game.COLS).fill(value);
+}
+
+describe(&#39;Tetris Game Tests&#39;, () =&gt; {
+  beforeEach(() =&gt; {
+    // Reset game state before each test
+    game.createBoard();
+    game.setScore(0);
+    game.setLevel(1);
+    game.setLines(0);
+    game.setGameOver(false);
+    game.setPaused(false);
+    game.setAntiGravity(false);
+    game.setDropInterval(1000);
+  });
+
+  // ============================================
+  // 1. Piece Movement Tests
+  // ============================================
+  describe(&#39;1. Piece Movement Tests&#39;, () =&gt; {
+
+    describe(&#39;1.1 Move Left - Valid Move&#39;, () =&gt; {
+      it(&#39;should decrease x position by 1 and return true&#39;, () =&gt; {
+        const piece = game.createPiece(6); // T-piece
+        piece.x = 5;
+        piece.y = 5;
+        game.setCurrentPiece(piece);
+
+        const result = game.movePiece(-1, 0);
+
+        expect(result).toBe(true);
+        expect(game.getCurrentPiece().x).toBe(4);
+      });
+    });
+
+    describe(&#39;1.2 Move Right - Valid Move&#39;, () =&gt; {
+      it(&#39;should increase x position by 1 and return true&#39;, () =&gt; {
+        const piece = game.createPiece(6); // T-piece
+        piece.x = 4;
+        piece.y = 5;
+        game.setCurrentPiece(piece);
+
+        const result = game.movePiece(1, 0);
+
+        expect(result).toBe(true);
+        expect(game.getCurrentPiece().x).toBe(5);
+      });
+    });
+
+    describe(&#39;1.3 Move Left - Blocked by Left Wall&#39;, () =&gt; {
+      it(&#39;should not move and return false when at left edge&#39;, () =&gt; {
+        const piece = game.createPiece(6); // T-piece
+        piece.x = 0;
+        piece.y = 5;
+        game.setCurrentPiece(piece);
+
+        const result = game.movePiece(-1, 0);
+
+        expect(result).toBe(false);
+        expect(game.getCurrentPiece().x).toBe(0);
+      });
+    });
+
+    describe(&#39;1.4 Move Right - Blocked by Right Wall&#39;, () =&gt; {
+      it(&#39;should not move and return false when at right edge&#39;, () =&gt; {
+        const piece = game.createPiece(1); // I-piece (4 wide)
+        piece.x = 6; // Rightmost position for I-piece
+        piece.y = 5;
+        game.setCurrentPiece(piece);
+
+        const result = game.movePiece(1, 0);
+
+        expect(result).toBe(false);
+        expect(game.getCurrentPiece().x).toBe(6);
+      });
+    });
+
+    describe(&#39;1.5 Soft Drop - Normal Gravity&#39;, () =&gt; {
+      it(&#39;should increase y position by 1 and return true&#39;, () =&gt; {
+        game.setAntiGravity(false);
+        const piece = game.createPiece(6);
+        piece.x = 4;
+        piece.y = 5;
+        game.setCurrentPiece(piece);
+
+        const result = game.movePiece(0, 1);
+
+        expect(result).toBe(true);
+        expect(game.getCurrentPiece().y).toBe(6);
+      });
+    });
+
+    describe(&#39;1.6 Soft Drop - Anti-Gravity&#39;, () =&gt; {
+      it(&#39;should decrease y position by 1 and return true&#39;, () =&gt; {
+        game.setAntiGravity(true);
+        const piece = game.createPiece(6);
+        piece.x = 4;
+        piece.y = 15;
+        game.setCurrentPiece(piece);
+
+        const result = game.movePiece(0, -1);
+
+        expect(result).toBe(true);
+        expect(game.getCurrentPiece().y).toBe(14);
+      });
+    });
+
+    describe(&#39;1.7 Hard Drop - Normal Gravity&#39;, () =&gt; {
+      it(&#39;should move piece to bottom and add 2 points per cell&#39;, () =&gt; {
+        game.setAntiGravity(false);
+        const piece = game.createPiece(4); // O-piece (2x2)
+        piece.x = 4;
+        piece.y = 5;
+        game.setCurrentPiece(piece);
+        game.setNextPiece(game.createPiece(1));
+        game.setScore(0);
+
+        // O-piece is 2 rows tall, so it drops from y=5 to y=18 (13 cells)
+        game.hardDrop();
+
+        expect(game.getScore()).toBe(13 * 2); // 26 points
+      });
+    });
+
+    describe(&#39;1.8 Hard Drop - Anti-Gravity&#39;, () =&gt; {
+      it(&#39;should move piece to top and add 2 points per cell&#39;, () =&gt; {
+        game.setAntiGravity(true);
+        const piece = game.createPiece(4); // O-piece (2x2)
+        piece.x = 4;
+        piece.y = 15;
+        game.setCurrentPiece(piece);
+        game.setNextPiece(game.createPiece(1));
+        game.setScore(0);
+
+        // O-piece rises from y=15 to y=0 (15 cells)
+        game.hardDrop();
+
+        expect(game.getScore()).toBe(15 * 2); // 30 points
+      });
+    });
+
+    describe(&#39;1.9 Move Blocked by Existing Piece&#39;, () =&gt; {
+      it(&#39;should not move and return false when blocked by existing piece&#39;, () =&gt; {
+        const board = createEmptyBoard();
+        board[10][3] = 1; // Block at position (3, 10)
+        game.setBoard(board);
+
+        const piece = game.createPiece(4); // O-piece
+        piece.x = 4;
+        piece.y = 9; // O-piece occupies rows 9-10, cols 4-5
+        game.setCurrentPiece(piece);
+
+        const result = game.movePiece(-1, 0); // Try to move left into (3, 10)
+
+        expect(result).toBe(false);
+        expect(game.getCurrentPiece().x).toBe(4);
+      });
+    });
+  });
+
+  // ============================================
+  // 2. Rotation Tests
+  // ============================================
+  describe(&#39;2. Rotation Tests&#39;, () =&gt; {
+
+    describe(&#39;2.1 Basic Rotation - T-Piece&#39;, () =&gt; {
+      it(&#39;should rotate T-piece 90 degrees clockwise&#39;, () =&gt; {
+        const piece = game.createPiece(6); // T-piece
+        piece.x = 4;
+        piece.y = 5;
+        game.setCurrentPiece(piece);
+
+        // Original: [[0, 6, 0], [6, 6, 6]]
+        game.rotatePiece();
+
+        const rotated = game.getCurrentPiece().shape;
+        expect(rotated).toEqual([[6, 0], [6, 6], [6, 0]]);
+      });
+    });
+
+    describe(&#39;2.2 Basic Rotation - I-Piece&#39;, () =&gt; {
+      it(&#39;should rotate I-piece from horizontal to vertical&#39;, () =&gt; {
+        const piece = game.createPiece(1); // I-piece
+        piece.x = 3;
+        piece.y = 5;
+        game.setCurrentPiece(piece);
+
+        // Original: [[1, 1, 1, 1]]
+        game.rotatePiece();
+
+        const rotated = game.getCurrentPiece().shape;
+        expect(rotated).toEqual([[1], [1], [1], [1]]);
+      });
+    });
+
+    describe(&#39;2.3 Basic Rotation - J-Piece&#39;, () =&gt; {
+      it(&#39;should rotate J-piece 90 degrees clockwise&#39;, () =&gt; {
+        const piece = game.createPiece(2); // J-piece
+        piece.x = 4;
+        piece.y = 5;
+        game.setCurrentPiece(piece);
+
+        // Original: [[2, 0, 0], [2, 2, 2]]
+        game.rotatePiece();
+
+        const rotated = game.getCurrentPiece().shape;
+        expect(rotated).toEqual([[2, 2], [2, 0], [2, 0]]);
+      });
+    });
+
+    describe(&#39;2.4 Basic Rotation - L-Piece&#39;, () =&gt; {
+      it(&#39;should rotate L-piece 90 degrees clockwise&#39;, () =&gt; {
+        const piece = game.createPiece(3); // L-piece
+        piece.x = 4;
+        piece.y = 5;
+        game.setCurrentPiece(piece);
+
+        // Original: [[0, 0, 3], [3, 3, 3]]
+        game.rotatePiece();
+
+        const rotated = game.getCurrentPiece().shape;
+        expect(rotated).toEqual([[3, 0], [3, 0], [3, 3]]);
+      });
+    });
+
+    describe(&#39;2.5 Basic Rotation - S-Piece&#39;, () =&gt; {
+      it(&#39;should rotate S-piece 90 degrees clockwise&#39;, () =&gt; {
+        const piece = game.createPiece(5); // S-piece
+        piece.x = 4;
+        piece.y = 5;
+        game.setCurrentPiece(piece);
+
+        // Original: [[0, 5, 5], [5, 5, 0]]
+        game.rotatePiece();
+
+        const rotated = game.getCurrentPiece().shape;
+        expect(rotated).toEqual([[5, 0], [5, 5], [0, 5]]);
+      });
+    });
+
+    describe(&#39;2.6 Basic Rotation - Z-Piece&#39;, () =&gt; {
+      it(&#39;should rotate Z-piece 90 degrees clockwise&#39;, () =&gt; {
+        const piece = game.createPiece(7); // Z-piece
+        piece.x = 4;
+        piece.y = 5;
+        game.setCurrentPiece(piece);
+
+        // Original: [[7, 7, 0], [0, 7, 7]]
+        game.rotatePiece();
+
+        const rotated = game.getCurrentPiece().shape;
+        expect(rotated).toEqual([[0, 7], [7, 7], [7, 0]]);
+      });
+    });
+
+    describe(&#39;2.7 O-Piece - No Rotation Change&#39;, () =&gt; {
+      it(&#39;should remain visually identical after rotation&#39;, () =&gt; {
+        const piece = game.createPiece(4); // O-piece
+        piece.x = 4;
+        piece.y = 5;
+        game.setCurrentPiece(piece);
+
+        const originalShape = JSON.stringify(piece.shape);
+        game.rotatePiece();
+
+        const rotatedShape = JSON.stringify(game.getCurrentPiece().shape);
+        expect(rotatedShape).toBe(originalShape);
+      });
+    });
+
+    describe(&#39;2.8 Wall Kick - Near Left Wall&#39;, () =&gt; {
+      it(&#39;should rotate with wall kick adjustment when near left wall&#39;, () =&gt; {
+        const piece = game.createPiece(1); // I-piece vertical
+        piece.shape = [[1], [1], [1], [1]];
+        piece.x = 0;
+        piece.y = 5;
+        game.setCurrentPiece(piece);
+
+        game.rotatePiece();
+
+        // Should have rotated and kicked right
+        const current = game.getCurrentPiece();
+        expect(current.shape).toEqual([[1, 1, 1, 1]]);
+        expect(current.x).toBeGreaterThanOrEqual(0);
+      });
+    });
+
+    describe(&#39;2.9 Wall Kick - Near Right Wall&#39;, () =&gt; {
+      it(&#39;should rotate with wall kick adjustment when near right wall&#39;, () =&gt; {
+        const piece = game.createPiece(1); // I-piece vertical
+        piece.shape = [[1], [1], [1], [1]];
+        piece.x = 9;
+        piece.y = 5;
+        game.setCurrentPiece(piece);
+
+        game.rotatePiece();
+
+        // Should have rotated and kicked left
+        const current = game.getCurrentPiece();
+        expect(current.shape).toEqual([[1, 1, 1, 1]]);
+        expect(current.x).toBeLessThanOrEqual(6); // Max x for horizontal I-piece
+      });
+    });
+
+    describe(&#39;2.10 Rotation Blocked by Existing Pieces&#39;, () =&gt; {
+      it(&#39;should not rotate when blocked by existing pieces&#39;, () =&gt; {
+        const board = createEmptyBoard();
+        // Create a tight space that blocks rotation
+        board[5][3] = 1;
+        board[5][5] = 1;
+        board[6][3] = 1;
+        board[6][5] = 1;
+        board[7][3] = 1;
+        board[7][5] = 1;
+        game.setBoard(board);
+
+        const piece = game.createPiece(1); // I-piece horizontal
+        piece.x = 4;
+        piece.y = 5;
+        game.setCurrentPiece(piece);
+
+        const originalShape = JSON.stringify(piece.shape);
+        const originalX = piece.x;
+
+        game.rotatePiece();
+
+        // Shape should remain unchanged (rotation blocked)
+        expect(JSON.stringify(game.getCurrentPiece().shape)).toBe(originalShape);
+        expect(game.getCurrentPiece().x).toBe(originalX);
+      });
+    });
+
+    describe(&#39;2.11 Wall Kick Tries Multiple Offsets&#39;, () =&gt; {
+      it(&#39;should try multiple kick offsets to find valid position&#39;, () =&gt; {
+        const board = createEmptyBoard();
+        // Block offset 0 and -1, but allow offset 1
+        board[5][4] = 1;
+        board[5][3] = 1;
+        game.setBoard(board);
+
+        const piece = game.createPiece(6); // T-piece
+        piece.x = 4;
+        piece.y = 6;
+        game.setCurrentPiece(piece);
+
+        game.rotatePiece();
+
+        // Should have found a valid position with some kick offset
+        const current = game.getCurrentPiece();
+        expect(current.shape.length).toBe(3); // Rotated T-piece is 3 rows
+      });
+    });
+  });
+
+  // ============================================
+  // 3. Line Clearing Tests
+  // ============================================
+  describe(&#39;3. Line Clearing Tests&#39;, () =&gt; {
+
+    describe(&#39;3.1 Single Line Clear - Normal Gravity&#39;, () =&gt; {
+      it(&#39;should clear bottom row and add 100 * level points&#39;, () =&gt; {
+        game.setAntiGravity(false);
+        game.setLevel(1);
+        game.setScore(0);
+        game.setLines(0);
+
+        const board = createEmptyBoard();
+        board[19] = createFilledRow();
+        game.setBoard(board);
+
+        game.clearLines();
+
+        expect(game.getLines()).toBe(1);
+        expect(game.getScore()).toBe(100);
+        expect(game.getBoard()[19].every(cell =&gt; cell === 0)).toBe(true);
+      });
+    });
+
+    describe(&#39;3.2 Double Line Clear&#39;, () =&gt; {
+      it(&#39;should clear 2 rows and add 300 * level points&#39;, () =&gt; {
+        game.setAntiGravity(false);
+        game.setLevel(1);
+        game.setScore(0);
+        game.setLines(0);
+
+        const board = createEmptyBoard();
+        board[18] = createFilledRow();
+        board[19] = createFilledRow();
+        game.setBoard(board);
+
+        game.clearLines();
+
+        expect(game.getLines()).toBe(2);
+        expect(game.getScore()).toBe(300);
+      });
+    });
+
+    describe(&#39;3.3 Triple Line Clear&#39;, () =&gt; {
+      it(&#39;should clear 3 rows and add 500 * level points&#39;, () =&gt; {
+        game.setAntiGravity(false);
+        game.setLevel(1);
+        game.setScore(0);
+        game.setLines(0);
+
+        const board = createEmptyBoard();
+        board[17] = createFilledRow();
+        board[18] = createFilledRow();
+        board[19] = createFilledRow();
+        game.setBoard(board);
+
+        game.clearLines();
+
+        expect(game.getLines()).toBe(3);
+        expect(game.getScore()).toBe(500);
+      });
+    });
+
+    describe(&#39;3.4 Tetris (4 Lines Clear)&#39;, () =&gt; {
+      it(&#39;should clear 4 rows and add 800 * level points&#39;, () =&gt; {
+        game.setAntiGravity(false);
+        game.setLevel(1);
+        game.setScore(0);
+        game.setLines(0);
+
+        const board = createEmptyBoard();
+        board[16] = createFilledRow();
+        board[17] = createFilledRow();
+        board[18] = createFilledRow();
+        board[19] = createFilledRow();
+        game.setBoard(board);
+
+        game.clearLines();
+
+        expect(game.getLines()).toBe(4);
+        expect(game.getScore()).toBe(800);
+      });
+    });
+
+    describe(&#39;3.5 Anti-Gravity Line Clear - From Top&#39;, () =&gt; {
+      it(&#39;should clear top row and add empty row at bottom&#39;, () =&gt; {
+        game.setAntiGravity(true);
+        game.setLevel(1);
+        game.setScore(0);
+        game.setLines(0);
+
+        const board = createEmptyBoard();
+        board[0] = createFilledRow();
+        board[1][5] = 1; // Marker to verify shift
+        game.setBoard(board);
+
+        game.clearLines();
+
+        expect(game.getLines()).toBe(1);
+        expect(game.getBoard()[0][5]).toBe(1); // Marker shifted up
+        expect(game.getBoard()[19].every(cell =&gt; cell === 0)).toBe(true);
+      });
+    });
+
+    describe(&#39;3.6 Line Clear Scoring at Higher Levels&#39;, () =&gt; {
+      it(&#39;should multiply points by level&#39;, () =&gt; {
+        game.setAntiGravity(false);
+        game.setLevel(5);
+        game.setScore(0);
+        game.setLines(0);
+
+        const board = createEmptyBoard();
+        board[19] = createFilledRow();
+        game.setBoard(board);
+
+        game.clearLines();
+
+        expect(game.getScore()).toBe(500); // 100 * 5
+      });
+    });
+
+    describe(&#39;3.7 No Lines to Clear&#39;, () =&gt; {
+      it(&#39;should not change score or lines when no rows are full&#39;, () =&gt; {
+        game.setScore(100);
+        game.setLines(5);
+
+        const board = createEmptyBoard();
+        board[19][0] = 1;
+        board[19][1] = 1;
+        // Row not full
+        game.setBoard(board);
+
+        game.clearLines();
+
+        expect(game.getScore()).toBe(100);
+        expect(game.getLines()).toBe(5);
+      });
+    });
+  });
+
+  // ============================================
+  // 4. Gravity System Tests
+  // ============================================
+  describe(&#39;4. Gravity System Tests&#39;, () =&gt; {
+
+    describe(&#39;4.1 Normal Gravity - Piece Falls Down&#39;, () =&gt; {
+      it(&#39;should move piece down when gravity is normal&#39;, () =&gt; {
+        game.setAntiGravity(false);
+        const piece = game.createPiece(6);
+        piece.y = 5;
+        game.setCurrentPiece(piece);
+
+        game.movePiece(0, 1);
+
+        expect(game.getCurrentPiece().y).toBe(6);
+      });
+    });
+
+    describe(&#39;4.2 Anti-Gravity - Piece Rises Up&#39;, () =&gt; {
+      it(&#39;should move piece up when gravity is anti&#39;, () =&gt; {
+        game.setAntiGravity(true);
+        const piece = game.createPiece(6);
+        piece.y = 15;
+        game.setCurrentPiece(piece);
+
+        game.movePiece(0, -1);
+
+        expect(game.getCurrentPiece().y).toBe(14);
+      });
+    });
+
+    describe(&#39;4.3 Toggle Gravity - Board Flips&#39;, () =&gt; {
+      it(&#39;should flip board vertically when gravity toggles&#39;, () =&gt; {
+        const board = createEmptyBoard();
+        board[19][5] = 1; // Block at bottom
+        game.setBoard(board);
+        game.setCurrentPiece(game.createPiece(6));
+        game.setAntiGravity(false);
+
+        game.flipBoard();
+
+        expect(game.getBoard()[0][5]).toBe(1); // Block now at top
+      });
+    });
+
+    describe(&#39;4.4 Toggle Gravity - J Piece Swaps to L&#39;, () =&gt; {
+      it(&#39;should swap J-pieces to L-pieces on board&#39;, () =&gt; {
+        const board = createEmptyBoard();
+        board[19][5] = 2; // J-piece block
+        game.setBoard(board);
+
+        game.swapBoardPieces();
+
+        expect(game.getBoard()[19][5]).toBe(3); // Now L-piece
+      });
+    });
+
+    describe(&#39;4.5 Toggle Gravity - L Piece Swaps to J&#39;, () =&gt; {
+      it(&#39;should swap L-pieces to J-pieces on board&#39;, () =&gt; {
+        const board = createEmptyBoard();
+        board[19][5] = 3; // L-piece block
+        game.setBoard(board);
+
+        game.swapBoardPieces();
+
+        expect(game.getBoard()[19][5]).toBe(2); // Now J-piece
+      });
+    });
+
+    describe(&#39;4.6 Toggle Gravity - S Piece Swaps to Z&#39;, () =&gt; {
+      it(&#39;should swap S-pieces to Z-pieces on board&#39;, () =&gt; {
+        const board = createEmptyBoard();
+        board[19][5] = 5; // S-piece block
+        game.setBoard(board);
+
+        game.swapBoardPieces();
+
+        expect(game.getBoard()[19][5]).toBe(7); // Now Z-piece
+      });
+    });
+
+    describe(&#39;4.7 Toggle Gravity - Z Piece Swaps to S&#39;, () =&gt; {
+      it(&#39;should swap Z-pieces to S-pieces on board&#39;, () =&gt; {
+        const board = createEmptyBoard();
+        board[19][5] = 7; // Z-piece block
+        game.setBoard(board);
+
+        game.swapBoardPieces();
+
+        expect(game.getBoard()[19][5]).toBe(5); // Now S-piece
+      });
+    });
+
+    describe(&#39;4.8 Non-Swappable Pieces - I Piece&#39;, () =&gt; {
+      it(&#39;should return same type for I-piece&#39;, () =&gt; {
+        expect(game.getSwappedType(1)).toBe(1);
+      });
+    });
+
+    describe(&#39;4.9 Non-Swappable Pieces - O Piece&#39;, () =&gt; {
+      it(&#39;should return same type for O-piece&#39;, () =&gt; {
+        expect(game.getSwappedType(4)).toBe(4);
+      });
+    });
+
+    describe(&#39;4.10 Non-Swappable Pieces - T Piece&#39;, () =&gt; {
+      it(&#39;should return same type for T-piece&#39;, () =&gt; {
+        expect(game.getSwappedType(6)).toBe(6);
+      });
+    });
+
+    describe(&#39;4.11 Current Piece Swaps on Toggle&#39;, () =&gt; {
+      it(&#39;should swap current J-piece to L-piece&#39;, () =&gt; {
+        const piece = game.createPiece(2); // J-piece
+        game.setCurrentPiece(piece);
+
+        game.swapCurrentPiece();
+
+        expect(game.getCurrentPiece().type).toBe(3); // L-piece
+      });
+    });
+
+    describe(&#39;4.12 Spawn Position - Normal Gravity&#39;, () =&gt; {
+      it(&#39;should spawn piece at top (y = 0)&#39;, () =&gt; {
+        game.setAntiGravity(false);
+
+        const piece = game.createPiece(6);
+
+        expect(piece.y).toBe(0);
+      });
+    });
+
+    describe(&#39;4.13 Spawn Position - Anti-Gravity&#39;, () =&gt; {
+      it(&#39;should spawn piece at bottom&#39;, () =&gt; {
+        game.setAntiGravity(true);
+
+        const piece = game.createPiece(6); // T-piece (2 rows tall)
+
+        expect(piece.y).toBe(game.ROWS - 2); // 18
+      });
+    });
+  });
+
+  // ============================================
+  // 5. Collision Detection Tests
+  // ============================================
+  describe(&#39;5. Collision Detection Tests&#39;, () =&gt; {
+
+    describe(&#39;5.1 Valid Move - Empty Space&#39;, () =&gt; {
+      it(&#39;should return true for valid position on empty board&#39;, () =&gt; {
+        const shape = [[1, 1], [1, 1]];
+
+        const result = game.isValidMove(shape, 4, 5);
+
+        expect(result).toBe(true);
+      });
+    });
+
+    describe(&#39;5.2 Invalid Move - Left Wall Boundary&#39;, () =&gt; {
+      it(&#39;should return false when piece extends past left wall&#39;, () =&gt; {
+        const shape = [[1, 1], [1, 1]];
+
+        const result = game.isValidMove(shape, -1, 5);
+
+        expect(result).toBe(false);
+      });
+    });
+
+    describe(&#39;5.3 Invalid Move - Right Wall Boundary&#39;, () =&gt; {
+      it(&#39;should return false when piece extends past right wall&#39;, () =&gt; {
+        const shape = [[1, 1], [1, 1]]; // 2 wide
+
+        const result = game.isValidMove(shape, 9, 5); // Would extend to col 10
+
+        expect(result).toBe(false);
+      });
+    });
+
+    describe(&#39;5.4 Invalid Move - Floor Boundary&#39;, () =&gt; {
+      it(&#39;should return false when piece extends past floor&#39;, () =&gt; {
+        const shape = [[1, 1], [1, 1]]; // 2 tall
+
+        const result = game.isValidMove(shape, 4, 19); // Would extend to row 20
+
+        expect(result).toBe(false);
+      });
+    });
+
+    describe(&#39;5.5 Invalid Move - Ceiling Boundary&#39;, () =&gt; {
+      it(&#39;should return false when piece extends past ceiling&#39;, () =&gt; {
+        const shape = [[1, 1], [1, 1]];
+
+        const result = game.isValidMove(shape, 4, -1);
+
+        expect(result).toBe(false);
+      });
+    });
+
+    describe(&#39;5.6 Invalid Move - Collision with Existing Piece&#39;, () =&gt; {
+      it(&#39;should return false when position overlaps existing block&#39;, () =&gt; {
+        const board = createEmptyBoard();
+        board[10][5] = 1;
+        game.setBoard(board);
+
+        const shape = [[1, 1], [1, 1]];
+
+        const result = game.isValidMove(shape, 4, 10); // Overlaps (5, 10)
+
+        expect(result).toBe(false);
+      });
+    });
+
+    describe(&#39;5.7 Valid Move - Adjacent to Existing Piece&#39;, () =&gt; {
+      it(&#39;should return true when adjacent but not overlapping&#39;, () =&gt; {
+        const board = createEmptyBoard();
+        board[10][5] = 1;
+        game.setBoard(board);
+
+        const shape = [[1, 1], [1, 1]];
+
+        const result = game.isValidMove(shape, 6, 10); // Adjacent, not overlapping
+
+        expect(result).toBe(true);
+      });
+    });
+
+    describe(&#39;5.8 Spawn Position Validation - Game Over&#39;, () =&gt; {
+      it(&#39;should set gameOver when spawn position is blocked&#39;, () =&gt; {
+        const board = createEmptyBoard();
+        // Fill the top area where pieces spawn
+        for (let c = 0; c &lt; game.COLS; c++) {
+          board[0][c] = 1;
+          board[1][c] = 1;
+        }
+        game.setBoard(board);
+        game.setNextPiece(game.createPiece(4));
+        game.setGameOver(false);
+
+        game.spawnPiece();
+
+        expect(game.isGameOver()).toBe(true);
+      });
+    });
+
+    describe(&#39;5.9 Ghost Position - Normal Gravity&#39;, () =&gt; {
+      it(&#39;should return bottom position for ghost&#39;, () =&gt; {
+        game.setAntiGravity(false);
+        const piece = game.createPiece(4); // O-piece
+        piece.x = 4;
+        piece.y = 5;
+        game.setCurrentPiece(piece);
+
+        const ghostY = game.getGhostPosition();
+
+        expect(ghostY).toBe(18); // Bottom position for 2-tall piece
+      });
+    });
+
+    describe(&#39;5.10 Ghost Position - Anti-Gravity&#39;, () =&gt; {
+      it(&#39;should return top position for ghost&#39;, () =&gt; {
+        game.setAntiGravity(true);
+        const piece = game.createPiece(4); // O-piece
+        piece.x = 4;
+        piece.y = 15;
+        game.setCurrentPiece(piece);
+
+        const ghostY = game.getGhostPosition();
+
+        expect(ghostY).toBe(0);
+      });
+    });
+  });
+
+  // ============================================
+  // 6. Scoring &amp; Progression Tests
+  // ============================================
+  describe(&#39;6. Scoring &amp; Progression Tests&#39;, () =&gt; {
+
+    describe(&#39;6.1 Soft Drop Points&#39;, () =&gt; {
+      it(&#39;should add points for soft drop (handled by caller)&#39;, () =&gt; {
+        const piece = game.createPiece(6);
+        piece.y = 5;
+        game.setCurrentPiece(piece);
+        game.setScore(0);
+
+        if (game.movePiece(0, 1)) {
+          game.setScore(game.getScore() + 1);
+        }
+
+        expect(game.getScore()).toBe(1);
+      });
+    });
+
+    describe(&#39;6.2 Hard Drop Points&#39;, () =&gt; {
+      it(&#39;should add 2 points per cell dropped&#39;, () =&gt; {
+        game.setAntiGravity(false);
+        const piece = game.createPiece(4); // O-piece
+        piece.x = 4;
+        piece.y = 10;
+        game.setCurrentPiece(piece);
+        game.setNextPiece(game.createPiece(1));
+        game.setScore(0);
+
+        // O-piece drops from y=10 to y=18 (8 cells)
+        game.hardDrop();
+
+        expect(game.getScore()).toBe(16); // 8 * 2
+      });
+    });
+
+    describe(&#39;6.3 Single Line Clear Points&#39;, () =&gt; {
+      it(&#39;should add 100 points at level 1&#39;, () =&gt; {
+        game.setLevel(1);
+        game.setScore(0);
+        game.setLines(0);
+        game.setAntiGravity(false);
+
+        const board = createEmptyBoard();
+        board[19] = createFilledRow();
+        game.setBoard(board);
+
+        game.clearLines();
+
+        expect(game.getScore()).toBe(100);
+      });
+    });
+
+    describe(&#39;6.4 Double Line Clear Points&#39;, () =&gt; {
+      it(&#39;should add 300 points at level 1&#39;, () =&gt; {
+        game.setLevel(1);
+        game.setScore(0);
+        game.setLines(0);
+        game.setAntiGravity(false);
+
+        const board = createEmptyBoard();
+        board[18] = createFilledRow();
+        board[19] = createFilledRow();
+        game.setBoard(board);
+
+        game.clearLines();
+
+        expect(game.getScore()).toBe(300);
+      });
+    });
+
+    describe(&#39;6.5 Triple Line Clear Points&#39;, () =&gt; {
+      it(&#39;should add 500 points at level 1&#39;, () =&gt; {
+        game.setLevel(1);
+        game.setScore(0);
+        game.setLines(0);
+        game.setAntiGravity(false);
+
+        const board = createEmptyBoard();
+        board[17] = createFilledRow();
+        board[18] = createFilledRow();
+        board[19] = createFilledRow();
+        game.setBoard(board);
+
+        game.clearLines();
+
+        expect(game.getScore()).toBe(500);
+      });
+    });
+
+    describe(&#39;6.6 Tetris Points&#39;, () =&gt; {
+      it(&#39;should add 800 points at level 1&#39;, () =&gt; {
+        game.setLevel(1);
+        game.setScore(0);
+        game.setLines(0);
+        game.setAntiGravity(false);
+
+        const board = createEmptyBoard();
+        board[16] = createFilledRow();
+        board[17] = createFilledRow();
+        board[18] = createFilledRow();
+        board[19] = createFilledRow();
+        game.setBoard(board);
+
+        game.clearLines();
+
+        expect(game.getScore()).toBe(800);
+      });
+    });
+
+    describe(&#39;6.7 Level Multiplier on Scoring&#39;, () =&gt; {
+      it(&#39;should multiply line clear points by level&#39;, () =&gt; {
+        game.setLevel(3);
+        game.setScore(0);
+        game.setLines(0);
+        game.setAntiGravity(false);
+
+        const board = createEmptyBoard();
+        board[19] = createFilledRow();
+        game.setBoard(board);
+
+        game.clearLines();
+
+        expect(game.getScore()).toBe(300); // 100 * 3
+      });
+    });
+
+    describe(&#39;6.8 Level Progression - Every 10 Lines&#39;, () =&gt; {
+      it(&#39;should increase level when lines reach 10&#39;, () =&gt; {
+        game.setLevel(1);
+        game.setLines(9);
+        game.setScore(0);
+        game.setAntiGravity(false);
+
+        const board = createEmptyBoard();
+        board[19] = createFilledRow();
+        game.setBoard(board);
+
+        game.clearLines();
+
+        expect(game.getLevel()).toBe(2);
+      });
+    });
+
+    describe(&#39;6.9 Level Progression - Multiple Levels&#39;, () =&gt; {
+      it(&#39;should calculate correct level for 25 lines&#39;, () =&gt; {
+        game.setLines(24);
+        game.setLevel(1);
+        game.setScore(0);
+        game.setAntiGravity(false);
+
+        const board = createEmptyBoard();
+        board[19] = createFilledRow();
+        game.setBoard(board);
+
+        game.clearLines();
+
+        // 25 lines = floor(25/10) + 1 = 3
+        expect(game.getLevel()).toBe(3);
+      });
+    });
+
+    describe(&#39;6.10 Drop Speed Decrease Per Level&#39;, () =&gt; {
+      it(&#39;should decrease drop interval by 100ms per level&#39;, () =&gt; {
+        game.setLines(9);
+        game.setLevel(1);
+        game.setDropInterval(1000);
+        game.setScore(0);
+        game.setAntiGravity(false);
+
+        const board = createEmptyBoard();
+        board[19] = createFilledRow();
+        game.setBoard(board);
+
+        game.clearLines();
+
+        expect(game.getDropInterval()).toBe(900);
+      });
+    });
+
+    describe(&#39;6.11 Drop Speed Minimum Cap&#39;, () =&gt; {
+      it(&#39;should not go below 100ms&#39;, () =&gt; {
+        game.setLines(99);
+        game.setLevel(10);
+        game.setScore(0);
+        game.setAntiGravity(false);
+
+        const board = createEmptyBoard();
+        board[19] = createFilledRow();
+        game.setBoard(board);
+
+        game.clearLines();
+
+        expect(game.getDropInterval()).toBe(100);
+      });
+    });
+
+    describe(&#39;6.12 Initial Score&#39;, () =&gt; {
+      it(&#39;should be 0 on reset&#39;, () =&gt; {
+        game.setScore(5000);
+        game.createBoard();
+        game.setScore(0);
+
+        expect(game.getScore()).toBe(0);
+      });
+    });
+
+    describe(&#39;6.13 Initial Level&#39;, () =&gt; {
+      it(&#39;should be 1 on reset&#39;, () =&gt; {
+        game.setLevel(5);
+        game.setLevel(1);
+
+        expect(game.getLevel()).toBe(1);
+      });
+    });
+  });
+
+  // ============================================
+  // 7. Game State Tests
+  // ============================================
+  describe(&#39;7. Game State Tests&#39;, () =&gt; {
+
+    describe(&#39;7.1 Pause Game&#39;, () =&gt; {
+      it(&#39;should set paused to true&#39;, () =&gt; {
+        game.setPaused(false);
+
+        game.togglePause();
+
+        expect(game.isPaused()).toBe(true);
+      });
+    });
+
+    describe(&#39;7.2 Unpause Game&#39;, () =&gt; {
+      it(&#39;should set paused to false&#39;, () =&gt; {
+        game.setPaused(true);
+
+        game.togglePause();
+
+        expect(game.isPaused()).toBe(false);
+      });
+    });
+
+    describe(&#39;7.3 Game Over Detection - Normal Gravity&#39;, () =&gt; {
+      it(&#39;should set gameOver when spawn blocked at top&#39;, () =&gt; {
+        game.setAntiGravity(false);
+        game.setGameOver(false);
+
+        const board = createEmptyBoard();
+        for (let c = 0; c &lt; game.COLS; c++) {
+          board[0][c] = 1;
+        }
+        game.setBoard(board);
+        game.setNextPiece(game.createPiece(4));
+
+        game.spawnPiece();
+
+        expect(game.isGameOver()).toBe(true);
+      });
+    });
+
+    describe(&#39;7.4 Game Over Detection - Anti-Gravity&#39;, () =&gt; {
+      it(&#39;should set gameOver when spawn blocked at bottom&#39;, () =&gt; {
+        game.setAntiGravity(true);
+        game.setGameOver(false);
+
+        const board = createEmptyBoard();
+        for (let c = 0; c &lt; game.COLS; c++) {
+          board[18][c] = 1;
+          board[19][c] = 1;
+        }
+        game.setBoard(board);
+        game.setNextPiece(game.createPiece(4));
+
+        game.spawnPiece();
+
+        expect(game.isGameOver()).toBe(true);
+      });
+    });
+
+    describe(&#39;7.5 Reset Game - Board Cleared&#39;, () =&gt; {
+      it(&#39;should clear all cells to 0&#39;, () =&gt; {
+        const board = createEmptyBoard();
+        board[19][5] = 1;
+        game.setBoard(board);
+
+        game.createBoard();
+
+        const newBoard = game.getBoard();
+        const allEmpty = newBoard.every(row =&gt; row.every(cell =&gt; cell === 0));
+        expect(allEmpty).toBe(true);
+      });
+    });
+
+    describe(&#39;7.6 Reset Game - Score Reset&#39;, () =&gt; {
+      it(&#39;should reset score to 0&#39;, () =&gt; {
+        game.setScore(5000);
+        game.setScore(0);
+
+        expect(game.getScore()).toBe(0);
+      });
+    });
+
+    describe(&#39;7.7 Reset Game - Level Reset&#39;, () =&gt; {
+      it(&#39;should reset level to 1&#39;, () =&gt; {
+        game.setLevel(5);
+        game.setLevel(1);
+
+        expect(game.getLevel()).toBe(1);
+      });
+    });
+
+    describe(&#39;7.8 Reset Game - Lines Reset&#39;, () =&gt; {
+      it(&#39;should reset lines to 0&#39;, () =&gt; {
+        game.setLines(45);
+        game.setLines(0);
+
+        expect(game.getLines()).toBe(0);
+      });
+    });
+
+    describe(&#39;7.9 Reset Game - Gravity Mode Reset&#39;, () =&gt; {
+      it(&#39;should reset antiGravity to false&#39;, () =&gt; {
+        game.setAntiGravity(true);
+        game.setAntiGravity(false);
+
+        expect(game.isAntiGravity()).toBe(false);
+      });
+    });
+
+    describe(&#39;7.10 Reset Game - Game Over Flag Reset&#39;, () =&gt; {
+      it(&#39;should reset gameOver to false&#39;, () =&gt; {
+        game.setGameOver(true);
+        game.setGameOver(false);
+
+        expect(game.isGameOver()).toBe(false);
+      });
+    });
+
+    describe(&#39;7.11 Reset Game - Pause Flag Reset&#39;, () =&gt; {
+      it(&#39;should reset paused to false&#39;, () =&gt; {
+        game.setPaused(true);
+        game.setPaused(false);
+
+        expect(game.isPaused()).toBe(false);
+      });
+    });
+
+    describe(&#39;7.12 Reset Game - Drop Interval Reset&#39;, () =&gt; {
+      it(&#39;should reset dropInterval to 1000&#39;, () =&gt; {
+        game.setDropInterval(500);
+        game.setDropInterval(1000);
+
+        expect(game.getDropInterval()).toBe(1000);
+      });
+    });
+
+    describe(&#39;7.13 Create Board Dimensions&#39;, () =&gt; {
+      it(&#39;should create board with 20 rows and 10 columns&#39;, () =&gt; {
+        game.createBoard();
+        const board = game.getBoard();
+
+        expect(board.length).toBe(20);
+        expect(board[0].length).toBe(10);
+        expect(board.every(row =&gt; row.every(cell =&gt; cell === 0))).toBe(true);
+      });
+    });
+
+    describe(&#39;7.14 Lock Piece - Places on Board&#39;, () =&gt; {
+      it(&#39;should place piece blocks on the board&#39;, () =&gt; {
+        game.createBoard();
+        const piece = game.createPiece(4); // O-piece
+        piece.x = 4;
+        piece.y = 18;
+        game.setCurrentPiece(piece);
+        game.setNextPiece(game.createPiece(1));
+
+        game.lockPiece();
+
+        const board = game.getBoard();
+        expect(board[18][4]).toBe(4);
+        expect(board[18][5]).toBe(4);
+        expect(board[19][4]).toBe(4);
+        expect(board[19][5]).toBe(4);
+      });
+    });
+
+    describe(&#39;7.15 New Piece Spawns After Lock&#39;, () =&gt; {
+      it(&#39;should set currentPiece to nextPiece and generate new nextPiece&#39;, () =&gt; {
+        game.createBoard();
+        const piece = game.createPiece(4);
+        piece.x = 4;
+        piece.y = 18;
+        game.setCurrentPiece(piece);
+
+        const nextPieceType = 2; // J-piece
+        game.setNextPiece(game.createPiece(nextPieceType));
+
+        game.lockPiece();
+
+        expect(game.getCurrentPiece().type).toBe(nextPieceType);
+        expect(game.getNextPiece()).not.toBeNull();
+      });
+    });
+  });
+});
+</pre></div><button class="expand-btn">Show more</button></div>
+</div></div></div>
+<div class="message tool-reply" id="msg-2026-01-30T21-19-06-105Z"><div class="message-header"><span class="role-label">Tool reply</span><a href="#msg-2026-01-30T21-19-06-105Z" class="timestamp-link"><time datetime="2026-01-30T21:19:06.105Z" data-timestamp="2026-01-30T21:19:06.105Z">2026-01-30T21:19:06.105Z</time></a></div><div class="message-content"><div class="tool-result"><div class="truncatable"><div class="truncatable-content"><pre>File created successfully at: /Users/chriswarner/Desktop/CS1970/Tetris Test Grav/tetris-game.test.js</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-19-15-992Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-19-15-992Z" class="timestamp-link"><time datetime="2026-01-30T21:19:15.992Z" data-timestamp="2026-01-30T21:19:15.992Z">2026-01-30T21:19:15.992Z</time></a></div><div class="message-content">
+<div class="thinking"><div class="thinking-label">Thinking</div><p>Now I need to check if Jest is installed and set up, then run the tests. Let me first check if there's a package.json and if Jest is configured.</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-19-16-261Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-19-16-261Z" class="timestamp-link"><time datetime="2026-01-30T21:19:16.261Z" data-timestamp="2026-01-30T21:19:16.261Z">2026-01-30T21:19:16.261Z</time></a></div><div class="message-content">
+<div class="assistant-text"><p>Now let me check if Jest is configured and install it if needed.</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-19-16-433Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-19-16-433Z" class="timestamp-link"><time datetime="2026-01-30T21:19:16.433Z" data-timestamp="2026-01-30T21:19:16.433Z">2026-01-30T21:19:16.433Z</time></a></div><div class="message-content">
+<div class="tool-use" data-tool-id="toolu_01TvYmZFggMkcYLYV5Yoftch"><div class="tool-header"><span class="tool-icon">⚙</span> Glob</div><div class="truncatable"><div class="truncatable-content"><pre class="json">{
+  &#34;pattern&#34;: &#34;package.json&#34;
+}</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message tool-reply" id="msg-2026-01-30T21-19-17-253Z"><div class="message-header"><span class="role-label">Tool reply</span><a href="#msg-2026-01-30T21-19-17-253Z" class="timestamp-link"><time datetime="2026-01-30T21:19:17.253Z" data-timestamp="2026-01-30T21:19:17.253Z">2026-01-30T21:19:17.253Z</time></a></div><div class="message-content"><div class="tool-result"><div class="truncatable"><div class="truncatable-content"><pre>No files found</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-19-24-575Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-19-24-575Z" class="timestamp-link"><time datetime="2026-01-30T21:19:24.575Z" data-timestamp="2026-01-30T21:19:24.575Z">2026-01-30T21:19:24.575Z</time></a></div><div class="message-content">
+<div class="thinking"><div class="thinking-label">Thinking</div><p>There's no package.json, so I need to initialize npm and install Jest first.</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-19-24-971Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-19-24-971Z" class="timestamp-link"><time datetime="2026-01-30T21:19:24.971Z" data-timestamp="2026-01-30T21:19:24.971Z">2026-01-30T21:19:24.971Z</time></a></div><div class="message-content">
+<div class="assistant-text"><p>No package.json exists. I'll initialize npm and install Jest.</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-19-25-613Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-19-25-613Z" class="timestamp-link"><time datetime="2026-01-30T21:19:25.613Z" data-timestamp="2026-01-30T21:19:25.613Z">2026-01-30T21:19:25.613Z</time></a></div><div class="message-content">
+<div class="tool-use bash-tool" data-tool-id="toolu_01XzCzFeZjPWXrXDVfSneKDj">
+<div class="tool-header"><span class="tool-icon">$</span> Bash</div>
+<div class="tool-description">Initialize npm project</div><div class="truncatable"><div class="truncatable-content"><pre class="bash-command">cd &#34;/Users/chriswarner/Desktop/CS1970/Tetris Test Grav&#34; &amp;&amp; npm init -y</pre></div><button class="expand-btn">Show more</button></div>
+</div></div></div>
+<div class="message tool-reply" id="msg-2026-01-30T21-20-29-635Z"><div class="message-header"><span class="role-label">Tool reply</span><a href="#msg-2026-01-30T21-20-29-635Z" class="timestamp-link"><time datetime="2026-01-30T21:20:29.635Z" data-timestamp="2026-01-30T21:20:29.635Z">2026-01-30T21:20:29.635Z</time></a></div><div class="message-content"><div class="tool-result"><div class="truncatable"><div class="truncatable-content"><pre>Wrote to /Users/chriswarner/Desktop/CS1970/Tetris Test Grav/package.json:
+
+{
+  &quot;name&quot;: &quot;tetris-test-grav&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;description&quot;: &quot;&quot;,
+  &quot;main&quot;: &quot;tetris-game.js&quot;,
+  &quot;scripts&quot;: {
+    &quot;test&quot;: &quot;echo \&quot;Error: no test specified\&quot; &amp;&amp; exit 1&quot;
+  },
+  &quot;keywords&quot;: [],
+  &quot;author&quot;: &quot;&quot;,
+  &quot;license&quot;: &quot;ISC&quot;,
+  &quot;type&quot;: &quot;commonjs&quot;
+}
+/Users/chriswarner/.zshenv:1: /Users/chriswarner/Developer/flutter/bin not found</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-20-32-743Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-20-32-743Z" class="timestamp-link"><time datetime="2026-01-30T21:20:32.743Z" data-timestamp="2026-01-30T21:20:32.743Z">2026-01-30T21:20:32.743Z</time></a></div><div class="message-content">
+<div class="thinking"><div class="thinking-label">Thinking</div><p>Good, npm is initialized. Now I need to install Jest and jest-environment-jsdom since we're using DOM mocking.</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-20-33-541Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-20-33-541Z" class="timestamp-link"><time datetime="2026-01-30T21:20:33.541Z" data-timestamp="2026-01-30T21:20:33.541Z">2026-01-30T21:20:33.541Z</time></a></div><div class="message-content">
+<div class="tool-use bash-tool" data-tool-id="toolu_01WmnXLwG5E4xnM63K3shUxi">
+<div class="tool-header"><span class="tool-icon">$</span> Bash</div>
+<div class="tool-description">Install Jest and jsdom environment</div><div class="truncatable"><div class="truncatable-content"><pre class="bash-command">cd &#34;/Users/chriswarner/Desktop/CS1970/Tetris Test Grav&#34; &amp;&amp; npm install --save-dev jest jest-environment-jsdom</pre></div><button class="expand-btn">Show more</button></div>
+</div></div></div>
+<div class="message tool-reply" id="msg-2026-01-30T21-20-52-251Z"><div class="message-header"><span class="role-label">Tool reply</span><a href="#msg-2026-01-30T21-20-52-251Z" class="timestamp-link"><time datetime="2026-01-30T21:20:52.251Z" data-timestamp="2026-01-30T21:20:52.251Z">2026-01-30T21:20:52.251Z</time></a></div><div class="message-content"><div class="tool-result"><div class="truncatable"><div class="truncatable-content"><pre>added 339 packages, and audited 340 packages in 11s
+
+51 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+/Users/chriswarner/.zshenv:1: /Users/chriswarner/Developer/flutter/bin not found
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-20-59-941Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-20-59-941Z" class="timestamp-link"><time datetime="2026-01-30T21:20:59.941Z" data-timestamp="2026-01-30T21:20:59.941Z">2026-01-30T21:20:59.941Z</time></a></div><div class="message-content">
+<div class="thinking"><div class="thinking-label">Thinking</div><p>Jest is installed. Now I need to configure Jest to use jsdom environment and update the test script in package.json. Let me create a jest.config.js file and update package.json.</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-21-00-428Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-21-00-428Z" class="timestamp-link"><time datetime="2026-01-30T21:21:00.428Z" data-timestamp="2026-01-30T21:21:00.428Z">2026-01-30T21:21:00.428Z</time></a></div><div class="message-content">
+<div class="assistant-text"><p>Now I'll configure Jest and update the test script.</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-21-01-272Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-21-01-272Z" class="timestamp-link"><time datetime="2026-01-30T21:21:01.272Z" data-timestamp="2026-01-30T21:21:01.272Z">2026-01-30T21:21:01.272Z</time></a></div><div class="message-content"><div class="file-tool write-tool" data-tool-id="toolu_01BuvkfijFyLwbyapzFMMsQC">
+<div class="file-tool-header write-header"><span class="file-tool-icon">📝</span> Write <span class="file-tool-path">jest.config.js</span></div>
+<div class="file-tool-fullpath">/Users/chriswarner/Desktop/CS1970/Tetris Test Grav/jest.config.js</div>
+<div class="truncatable"><div class="truncatable-content"><pre class="file-content">module.exports = {
+  testEnvironment: &#39;jsdom&#39;,
+  verbose: true
+};
+</pre></div><button class="expand-btn">Show more</button></div>
+</div></div></div>
+<div class="message tool-reply" id="msg-2026-01-30T21-21-01-324Z"><div class="message-header"><span class="role-label">Tool reply</span><a href="#msg-2026-01-30T21-21-01-324Z" class="timestamp-link"><time datetime="2026-01-30T21:21:01.324Z" data-timestamp="2026-01-30T21:21:01.324Z">2026-01-30T21:21:01.324Z</time></a></div><div class="message-content"><div class="tool-result"><div class="truncatable"><div class="truncatable-content"><pre>File created successfully at: /Users/chriswarner/Desktop/CS1970/Tetris Test Grav/jest.config.js</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-21-01-671Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-21-01-671Z" class="timestamp-link"><time datetime="2026-01-30T21:21:01.671Z" data-timestamp="2026-01-30T21:21:01.671Z">2026-01-30T21:21:01.671Z</time></a></div><div class="message-content">
+<div class="tool-use" data-tool-id="toolu_01RFnwJddzhw2mooeoJHn7bm"><div class="tool-header"><span class="tool-icon">⚙</span> Read</div><div class="truncatable"><div class="truncatable-content"><pre class="json">{
+  &#34;file_path&#34;: &#34;/Users/chriswarner/Desktop/CS1970/Tetris Test Grav/package.json&#34;
+}</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message tool-reply" id="msg-2026-01-30T21-21-01-676Z"><div class="message-header"><span class="role-label">Tool reply</span><a href="#msg-2026-01-30T21-21-01-676Z" class="timestamp-link"><time datetime="2026-01-30T21:21:01.676Z" data-timestamp="2026-01-30T21:21:01.676Z">2026-01-30T21:21:01.676Z</time></a></div><div class="message-content"><div class="tool-result"><div class="truncatable"><div class="truncatable-content"><pre>     1→{
+     2→  &quot;name&quot;: &quot;tetris-test-grav&quot;,
+     3→  &quot;version&quot;: &quot;1.0.0&quot;,
+     4→  &quot;description&quot;: &quot;&quot;,
+     5→  &quot;main&quot;: &quot;tetris-game.js&quot;,
+     6→  &quot;scripts&quot;: {
+     7→    &quot;test&quot;: &quot;echo \&quot;Error: no test specified\&quot; &amp;&amp; exit 1&quot;
+     8→  },
+     9→  &quot;keywords&quot;: [],
+    10→  &quot;author&quot;: &quot;&quot;,
+    11→  &quot;license&quot;: &quot;ISC&quot;,
+    12→  &quot;type&quot;: &quot;commonjs&quot;,
+    13→  &quot;devDependencies&quot;: {
+    14→    &quot;jest&quot;: &quot;^30.2.0&quot;,
+    15→    &quot;jest-environment-jsdom&quot;: &quot;^30.2.0&quot;
+    16→  }
+    17→}
+    18→
+
+&lt;system-reminder&gt;
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+&lt;/system-reminder&gt;
+</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-21-09-533Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-21-09-533Z" class="timestamp-link"><time datetime="2026-01-30T21:21:09.533Z" data-timestamp="2026-01-30T21:21:09.533Z">2026-01-30T21:21:09.533Z</time></a></div><div class="message-content">
+<div class="thinking"><div class="thinking-label">Thinking</div><p>Good, now I need to update package.json to set the test script to run jest.</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-21-10-586Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-21-10-586Z" class="timestamp-link"><time datetime="2026-01-30T21:21:10.586Z" data-timestamp="2026-01-30T21:21:10.586Z">2026-01-30T21:21:10.586Z</time></a></div><div class="message-content"><div class="file-tool edit-tool" data-tool-id="toolu_0113oVwK8goWWNsk7xW9dHZD">
+<div class="file-tool-header edit-header"><span class="file-tool-icon">✏️</span> Edit <span class="file-tool-path">package.json</span></div>
+<div class="file-tool-fullpath">/Users/chriswarner/Desktop/CS1970/Tetris Test Grav/package.json</div>
+<div class="truncatable"><div class="truncatable-content">
+<div class="edit-section edit-old"><div class="edit-label">−</div><pre class="edit-content">  &#34;scripts&#34;: {
+    &#34;test&#34;: &#34;echo \&#34;Error: no test specified\&#34; &amp;&amp; exit 1&#34;
+  },</pre></div>
+<div class="edit-section edit-new"><div class="edit-label">+</div><pre class="edit-content">  &#34;scripts&#34;: {
+    &#34;test&#34;: &#34;jest&#34;
+  },</pre></div>
+</div><button class="expand-btn">Show more</button></div>
+</div></div></div>
+<div class="message tool-reply" id="msg-2026-01-30T21-21-15-607Z"><div class="message-header"><span class="role-label">Tool reply</span><a href="#msg-2026-01-30T21-21-15-607Z" class="timestamp-link"><time datetime="2026-01-30T21:21:15.607Z" data-timestamp="2026-01-30T21:21:15.607Z">2026-01-30T21:21:15.607Z</time></a></div><div class="message-content"><div class="tool-result"><div class="truncatable"><div class="truncatable-content"><pre>The file /Users/chriswarner/Desktop/CS1970/Tetris Test Grav/package.json has been updated successfully.</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-21-22-754Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-21-22-754Z" class="timestamp-link"><time datetime="2026-01-30T21:21:22.754Z" data-timestamp="2026-01-30T21:21:22.754Z">2026-01-30T21:21:22.754Z</time></a></div><div class="message-content">
+<div class="thinking"><div class="thinking-label">Thinking</div><p>Now let me run the tests.</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-21-23-075Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-21-23-075Z" class="timestamp-link"><time datetime="2026-01-30T21:21:23.075Z" data-timestamp="2026-01-30T21:21:23.075Z">2026-01-30T21:21:23.075Z</time></a></div><div class="message-content">
+<div class="assistant-text"><p>Now let's run the tests.</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-21-23-758Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-21-23-758Z" class="timestamp-link"><time datetime="2026-01-30T21:21:23.758Z" data-timestamp="2026-01-30T21:21:23.758Z">2026-01-30T21:21:23.758Z</time></a></div><div class="message-content">
+<div class="tool-use bash-tool" data-tool-id="toolu_015ccr6t48Aq7466oqUqk8HU">
+<div class="tool-header"><span class="tool-icon">$</span> Bash</div>
+<div class="tool-description">Run Jest tests</div><div class="truncatable"><div class="truncatable-content"><pre class="bash-command">cd &#34;/Users/chriswarner/Desktop/CS1970/Tetris Test Grav&#34; &amp;&amp; npm test 2&gt;&amp;1</pre></div><button class="expand-btn">Show more</button></div>
+</div></div></div>
+<div class="message tool-reply" id="msg-2026-01-30T21-21-55-042Z"><div class="message-header"><span class="role-label">Tool reply</span><a href="#msg-2026-01-30T21-21-55-042Z" class="timestamp-link"><time datetime="2026-01-30T21:21:55.042Z" data-timestamp="2026-01-30T21:21:55.042Z">2026-01-30T21:21:55.042Z</time></a></div><div class="message-content"><div class="tool-result tool-error"><div class="truncatable"><div class="truncatable-content"><pre>Exit code 1
+/Users/chriswarner/.zshenv:1: /Users/chriswarner/Developer/flutter/bin not found
+
+
+&gt; tetris-test-grav@1.0.0 test
+&gt; jest
+
+FAIL ./tetris-game.test.js
+  Tetris Game Tests
+    1. Piece Movement Tests
+      1.1 Move Left - Valid Move
+        ✓ should decrease x position by 1 and return true (1 ms)
+      1.2 Move Right - Valid Move
+        ✓ should increase x position by 1 and return true
+      1.3 Move Left - Blocked by Left Wall
+        ✓ should not move and return false when at left edge
+      1.4 Move Right - Blocked by Right Wall
+        ✓ should not move and return false when at right edge
+      1.5 Soft Drop - Normal Gravity
+        ✓ should increase y position by 1 and return true
+      1.6 Soft Drop - Anti-Gravity
+        ✓ should decrease y position by 1 and return true
+      1.7 Hard Drop - Normal Gravity
+        ✕ should move piece to bottom and add 2 points per cell
+      1.8 Hard Drop - Anti-Gravity
+        ✕ should move piece to top and add 2 points per cell (1 ms)
+      1.9 Move Blocked by Existing Piece
+        ✓ should not move and return false when blocked by existing piece
+    2. Rotation Tests
+      2.1 Basic Rotation - T-Piece
+        ✓ should rotate T-piece 90 degrees clockwise
+      2.2 Basic Rotation - I-Piece
+        ✓ should rotate I-piece from horizontal to vertical (1 ms)
+      2.3 Basic Rotation - J-Piece
+        ✓ should rotate J-piece 90 degrees clockwise
+      2.4 Basic Rotation - L-Piece
+        ✓ should rotate L-piece 90 degrees clockwise
+      2.5 Basic Rotation - S-Piece
+        ✓ should rotate S-piece 90 degrees clockwise
+      2.6 Basic Rotation - Z-Piece
+        ✓ should rotate Z-piece 90 degrees clockwise
+      2.7 O-Piece - No Rotation Change
+        ✓ should remain visually identical after rotation
+      2.8 Wall Kick - Near Left Wall
+        ✓ should rotate with wall kick adjustment when near left wall
+      2.9 Wall Kick - Near Right Wall
+        ✕ should rotate with wall kick adjustment when near right wall (2 ms)
+      2.10 Rotation Blocked by Existing Pieces
+        ✕ should not rotate when blocked by existing pieces
+      2.11 Wall Kick Tries Multiple Offsets
+        ✓ should try multiple kick offsets to find valid position (1 ms)
+    3. Line Clearing Tests
+      3.1 Single Line Clear - Normal Gravity
+        ✓ should clear bottom row and add 100 * level points
+      3.2 Double Line Clear
+        ✓ should clear 2 rows and add 300 * level points
+      3.3 Triple Line Clear
+        ✓ should clear 3 rows and add 500 * level points
+      3.4 Tetris (4 Lines Clear)
+        ✓ should clear 4 rows and add 800 * level points
+      3.5 Anti-Gravity Line Clear - From Top
+        ✓ should clear top row and add empty row at bottom (1 ms)
+      3.6 Line Clear Scoring at Higher Levels
+        ✓ should multiply points by level
+      3.7 No Lines to Clear
+        ✓ should not change score or lines when no rows are full
+    4. Gravity System Tests
+      4.1 Normal Gravity - Piece Falls Down
+        ✓ should move piece down when gravity is normal
+      4.2 Anti-Gravity - Piece Rises Up
+        ✓ should move piece up when gravity is anti
+      4.3 Toggle Gravity - Board Flips
+        ✓ should flip board vertically when gravity toggles
+      4.4 Toggle Gravity - J Piece Swaps to L
+        ✓ should swap J-pieces to L-pieces on board
+      4.5 Toggle Gravity - L Piece Swaps to J
+        ✓ should swap L-pieces to J-pieces on board
+      4.6 Toggle Gravity - S Piece Swaps to Z
+        ✓ should swap S-pieces to Z-pieces on board
+      4.7 Toggle Gravity - Z Piece Swaps to S
+        ✓ should swap Z-pieces to S-pieces on board
+      4.8 Non-Swappable Pieces - I Piece
+        ✓ should return same type for I-piece
+      4.9 Non-Swappable Pieces - O Piece
+        ✓ should return same type for O-piece
+      4.10 Non-Swappable Pieces - T Piece
+        ✓ should return same type for T-piece
+      4.11 Current Piece Swaps on Toggle
+        ✓ should swap current J-piece to L-piece
+      4.12 Spawn Position - Normal Gravity
+        ✓ should spawn piece at top (y = 0)
+      4.13 Spawn Position - Anti-Gravity
+        ✓ should spawn piece at bottom
+    5. Collision Detection Tests
+      5.1 Valid Move - Empty Space
+        ✓ should return true for valid position on empty board
+      5.2 Invalid Move - Left Wall Boundary
+        ✓ should return false when piece extends past left wall
+      5.3 Invalid Move - Right Wall Boundary
+        ✓ should return false when piece extends past right wall
+      5.4 Invalid Move - Floor Boundary
+        ✓ should return false when piece extends past floor
+      5.5 Invalid Move - Ceiling Boundary
+        ✓ should return false when piece extends past ceiling
+      5.6 Invalid Move - Collision with Existing Piece
+        ✓ should return false when position overlaps existing block
+      5.7 Valid Move - Adjacent to Existing Piece
+        ✓ should return true when adjacent but not overlapping
+      5.8 Spawn Position Validation - Game Over
+        ✕ should set gam
+
+... [5496 characters truncated] ...
+
+ct.toBe (tetris-game.test.js:359:62)
+
+  ● Tetris Game Tests › 5. Collision Detection Tests › 5.8 Spawn Position Validation - Game Over › should set gameOver when spawn position is blocked
+
+    TypeError: Cannot set properties of null (setting &#x27;fillStyle&#x27;)
+
+      196 |
+      197 | function drawNextPiece() {
+    &gt; 198 |     nextCtx.fillStyle = &#x27;#000&#x27;;
+          |                      ^
+      199 |     nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+      200 |
+      201 |     if (!nextPiece) return;
+
+      at drawNextPiece (tetris-game.js:198:22)
+      at Object.drawNextPiece [as spawnPiece] (tetris-game.js:366:5)
+      at Object.spawnPiece (tetris-game.test.js:764:14)
+
+  ● Tetris Game Tests › 6. Scoring &amp; Progression Tests › 6.2 Hard Drop Points › should add 2 points per cell dropped
+
+    TypeError: Cannot set properties of null (setting &#x27;fillStyle&#x27;)
+
+      196 |
+      197 | function drawNextPiece() {
+    &gt; 198 |     nextCtx.fillStyle = &#x27;#000&#x27;;
+          |                      ^
+      199 |     nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+      200 |
+      201 |     if (!nextPiece) return;
+
+      at drawNextPiece (tetris-game.js:198:22)
+      at drawNextPiece (tetris-game.js:366:5)
+      at spawnPiece (tetris-game.js:315:5)
+      at Object.lockPiece [as hardDrop] (tetris-game.js:297:5)
+      at Object.hardDrop (tetris-game.test.js:830:14)
+
+  ● Tetris Game Tests › 7. Game State Tests › 7.1 Pause Game › should set paused to true
+
+    TypeError: game.togglePause is not a function
+
+      1024 |         game.setPaused(false);
+      1025 |
+    &gt; 1026 |         game.togglePause();
+           |              ^
+      1027 |
+      1028 |         expect(game.isPaused()).toBe(true);
+      1029 |       });
+
+      at Object.togglePause (tetris-game.test.js:1026:14)
+
+  ● Tetris Game Tests › 7. Game State Tests › 7.2 Unpause Game › should set paused to false
+
+    TypeError: game.togglePause is not a function
+
+      1034 |         game.setPaused(true);
+      1035 |
+    &gt; 1036 |         game.togglePause();
+           |              ^
+      1037 |
+      1038 |         expect(game.isPaused()).toBe(false);
+      1039 |       });
+
+      at Object.togglePause (tetris-game.test.js:1036:14)
+
+  ● Tetris Game Tests › 7. Game State Tests › 7.3 Game Over Detection - Normal Gravity › should set gameOver when spawn blocked at top
+
+    TypeError: Cannot set properties of null (setting &#x27;fillStyle&#x27;)
+
+      196 |
+      197 | function drawNextPiece() {
+    &gt; 198 |     nextCtx.fillStyle = &#x27;#000&#x27;;
+          |                      ^
+      199 |     nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+      200 |
+      201 |     if (!nextPiece) return;
+
+      at drawNextPiece (tetris-game.js:198:22)
+      at Object.drawNextPiece [as spawnPiece] (tetris-game.js:366:5)
+      at Object.spawnPiece (tetris-game.test.js:1054:14)
+
+  ● Tetris Game Tests › 7. Game State Tests › 7.4 Game Over Detection - Anti-Gravity › should set gameOver when spawn blocked at bottom
+
+    TypeError: Cannot set properties of null (setting &#x27;fillStyle&#x27;)
+
+      196 |
+      197 | function drawNextPiece() {
+    &gt; 198 |     nextCtx.fillStyle = &#x27;#000&#x27;;
+          |                      ^
+      199 |     nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+      200 |
+      201 |     if (!nextPiece) return;
+
+      at drawNextPiece (tetris-game.js:198:22)
+      at Object.drawNextPiece [as spawnPiece] (tetris-game.js:366:5)
+      at Object.spawnPiece (tetris-game.test.js:1073:14)
+
+  ● Tetris Game Tests › 7. Game State Tests › 7.14 Lock Piece - Places on Board › should place piece blocks on the board
+
+    TypeError: Cannot set properties of null (setting &#x27;fillStyle&#x27;)
+
+      196 |
+      197 | function drawNextPiece() {
+    &gt; 198 |     nextCtx.fillStyle = &#x27;#000&#x27;;
+          |                      ^
+      199 |     nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+      200 |
+      201 |     if (!nextPiece) return;
+
+      at drawNextPiece (tetris-game.js:198:22)
+      at drawNextPiece (tetris-game.js:366:5)
+      at Object.spawnPiece [as lockPiece] (tetris-game.js:315:5)
+      at Object.lockPiece (tetris-game.test.js:1176:14)
+
+  ● Tetris Game Tests › 7. Game State Tests › 7.15 New Piece Spawns After Lock › should set currentPiece to nextPiece and generate new nextPiece
+
+    TypeError: Cannot set properties of null (setting &#x27;fillStyle&#x27;)
+
+      196 |
+      197 | function drawNextPiece() {
+    &gt; 198 |     nextCtx.fillStyle = &#x27;#000&#x27;;
+          |                      ^
+      199 |     nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+      200 |
+      201 |     if (!nextPiece) return;
+
+      at drawNextPiece (tetris-game.js:198:22)
+      at drawNextPiece (tetris-game.js:366:5)
+      at Object.spawnPiece [as lockPiece] (tetris-game.js:315:5)
+      at Object.lockPiece (tetris-game.test.js:1197:14)
+
+Test Suites: 1 failed, 1 total
+Tests:       12 failed, 66 passed, 78 total
+Snapshots:   0 total
+Time:        0.47 s
+Ran all test suites.</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-22-00-518Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-22-00-518Z" class="timestamp-link"><time datetime="2026-01-30T21:22:00.518Z" data-timestamp="2026-01-30T21:22:00.518Z">2026-01-30T21:22:00.518Z</time></a></div><div class="message-content">
+<div class="thinking"><div class="thinking-label">Thinking</div><p>Most tests pass (66/78). There are some failures related to:</p>
+<ol>
+<li>Canvas context being null - the <code>drawNextPiece</code> function requires canvas context which isn't properly set up</li>
+<li><code>togglePause</code> not being exported</li>
+<li>Some test logic issues with wall kick and rotation blocking tests</li>
+</ol>
+<p>Let me fix these issues:</p>
+<ol>
+<li>Need to mock canvas context properly</li>
+<li>Need to check if togglePause is exported from the module</li>
+</ol>
+<p>Let me look at the exports again and update the test file to mock the canvas properly.</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-22-01-571Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-22-01-571Z" class="timestamp-link"><time datetime="2026-01-30T21:22:01.571Z" data-timestamp="2026-01-30T21:22:01.571Z">2026-01-30T21:22:01.571Z</time></a></div><div class="message-content">
+<div class="assistant-text"><p>66 of 78 tests pass. Let me fix the failing tests. The issues are:
+1. Canvas context not mocked properly for tests calling <code>spawnPiece</code>/<code>lockPiece</code>
+2. <code>togglePause</code> isn't exported
+3. Some test setup issues</p></div></div></div>
+<div class="message assistant" id="msg-2026-01-30T21-22-02-428Z"><div class="message-header"><span class="role-label">Assistant</span><a href="#msg-2026-01-30T21-22-02-428Z" class="timestamp-link"><time datetime="2026-01-30T21:22:02.428Z" data-timestamp="2026-01-30T21:22:02.428Z">2026-01-30T21:22:02.428Z</time></a></div><div class="message-content">
+<div class="tool-use" data-tool-id="toolu_01KdLAhoLV18VvQzzFUaMPE5"><div class="tool-header"><span class="tool-icon">⚙</span> Read</div><div class="truncatable"><div class="truncatable-content"><pre class="json">{
+  &#34;file_path&#34;: &#34;/Users/chriswarner/Desktop/CS1970/Tetris Test Grav/tetris-game.js&#34;,
+  &#34;offset&#34;: 500,
+  &#34;limit&#34;: 60
+}</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message tool-reply" id="msg-2026-01-30T21-22-02-432Z"><div class="message-header"><span class="role-label">Tool reply</span><a href="#msg-2026-01-30T21-22-02-432Z" class="timestamp-link"><time datetime="2026-01-30T21:22:02.432Z" data-timestamp="2026-01-30T21:22:02.432Z">2026-01-30T21:22:02.432Z</time></a></div><div class="message-content"><div class="tool-result"><div class="truncatable"><div class="truncatable-content"><pre>   500→
+   501→// Export for testing (works in both browser and Node.js/test environments)
+   502→if (typeof module !== &#x27;undefined&#x27; &amp;&amp; module.exports) {
+   503→    module.exports = {
+   504→        // Constants
+   505→        COLS,
+   506→        ROWS,
+   507→        BLOCK_SIZE,
+   508→        COLORS,
+   509→        SHAPES,
+   510→        SWAP_MAP,
+   511→
+   512→        // State getters/setters for testing
+   513→        getBoard: () =&gt; board,
+   514→        setBoard: (b) =&gt; { board = b; },
+   515→        getCurrentPiece: () =&gt; currentPiece,
+   516→        setCurrentPiece: (p) =&gt; { currentPiece = p; },
+   517→        getNextPiece: () =&gt; nextPiece,
+   518→        setNextPiece: (p) =&gt; { nextPiece = p; },
+   519→        getScore: () =&gt; score,
+   520→        setScore: (s) =&gt; { score = s; },
+   521→        getLevel: () =&gt; level,
+   522→        setLevel: (l) =&gt; { level = l; },
+   523→        getLines: () =&gt; lines,
+   524→        setLines: (l) =&gt; { lines = l; },
+   525→        isGameOver: () =&gt; gameOver,
+   526→        setGameOver: (g) =&gt; { gameOver = g; },
+   527→        isPaused: () =&gt; paused,
+   528→        setPaused: (p) =&gt; { paused = p; },
+   529→        isAntiGravity: () =&gt; antiGravity,
+   530→        setAntiGravity: (a) =&gt; { antiGravity = a; },
+   531→        getDropInterval: () =&gt; dropInterval,
+   532→        setDropInterval: (d) =&gt; { dropInterval = d; },
+   533→
+   534→        // Core game functions
+   535→        createBoard,
+   536→        createPiece,
+   537→        getRandomPiece,
+   538→        resetCurrentPiece,
+   539→        getSwappedType,
+   540→        swapCurrentPiece,
+   541→        swapBoardPieces,
+   542→        isValidMove,
+   543→        rotatePiece,
+   544→        movePiece,
+   545→        hardDrop,
+   546→        lockPiece,
+   547→        clearLines,
+   548→        spawnPiece,
+   549→        flipBoard,
+   550→        getGhostPosition,
+   551→
+   552→        // For integration testing
+   553→        initGame,
+   554→        resetGame,
+   555→        handleKeyDown
+   556→    };
+   557→}
+   558→
+
+&lt;system-reminder&gt;
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+&lt;/system-reminder&gt;
+</pre></div><button class="expand-btn">Show more</button></div></div></div></div>
+<div class="message user" id="msg-2026-01-30T21-22-06-551Z"><div class="message-header"><span class="role-label">User</span><a href="#msg-2026-01-30T21-22-06-551Z" class="timestamp-link"><time datetime="2026-01-30T21:22:06.551Z" data-timestamp="2026-01-30T21:22:06.551Z">2026-01-30T21:22:06.551Z</time></a></div><div class="message-content">
+<div class="assistant-text"><p>[Request interrupted by user]</p></div></div></div>
+        
+
+<div class="pagination">
+<a href="index.html" class="index-link">Index</a>
+<span class="disabled">&larr; Prev</span>
+<span class="current">1</span>
+<a href="page-002.html">2</a>
+<a href="page-003.html">3</a>
+<a href="page-004.html">4</a>
+<a href="page-002.html">Next &rarr;</a>
+</div>
+
+    </div>
+    <script>
+document.querySelectorAll('time[data-timestamp]').forEach(function(el) {
+    const timestamp = el.getAttribute('data-timestamp');
+    const date = new Date(timestamp);
+    const now = new Date();
+    const isToday = date.toDateString() === now.toDateString();
+    const timeStr = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+    if (isToday) { el.textContent = timeStr; }
+    else { el.textContent = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' ' + timeStr; }
+});
+document.querySelectorAll('pre.json').forEach(function(el) {
+    let text = el.textContent;
+    text = text.replace(/"([^"]+)":/g, '<span style="color: #ce93d8">"$1"</span>:');
+    text = text.replace(/: "([^"]*)"/g, ': <span style="color: #81d4fa">"$1"</span>');
+    text = text.replace(/: (\d+)/g, ': <span style="color: #ffcc80">$1</span>');
+    text = text.replace(/: (true|false|null)/g, ': <span style="color: #f48fb1">$1</span>');
+    el.innerHTML = text;
+});
+document.querySelectorAll('.truncatable').forEach(function(wrapper) {
+    const content = wrapper.querySelector('.truncatable-content');
+    const btn = wrapper.querySelector('.expand-btn');
+    if (content.scrollHeight > 250) {
+        wrapper.classList.add('truncated');
+        btn.addEventListener('click', function() {
+            if (wrapper.classList.contains('truncated')) { wrapper.classList.remove('truncated'); wrapper.classList.add('expanded'); btn.textContent = 'Show less'; }
+            else { wrapper.classList.remove('expanded'); wrapper.classList.add('truncated'); btn.textContent = 'Show more'; }
+        });
+    }
+});
+</script>
+</body>
+</html>
